@@ -1,0 +1,27 @@
+/* HOME PAGE SPECIFIC STYLES */
+
+/* -------------------  MOBILE  --------------------- */
+
+
+/* -------------------  TABLET  --------------------- */
+@media (min-width: 768px) {
+}
+
+/* -------------------  DESKTOP  -------------------- */
+
+@media (min-width: 1224px) {
+    header {
+        background-image: url("../images/home.jpg");
+    }
+    footer {
+        background-color:cornflowerblue;
+    }
+    main {
+        background-color:blanchedalmond;
+    }
+}
+
+/* -------------------  LARGE SCREENS  -------------- */
+
+@media (min-width: 1824px) {
+}
