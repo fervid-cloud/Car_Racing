@@ -1,1 +1,10 @@
+#ignore file ending with name DS_Store
 .DS_Store
+
+#ignore folder name node_modules
+node_modules/
+
+#ignore the idea configuration hidden file
+.idea/
+
+
