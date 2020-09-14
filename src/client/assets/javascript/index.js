@@ -29,21 +29,38 @@ async function onPageLoad() {
 				console.log("reached at tracks then");
 				const html = renderTrackCards(tracks);
 				renderAt('#tracks', html);
-			})
+			});
 
 		 await getRacers()
 			.then((racers) => {
 				console.log("reached at car also");
 				const html = renderRacerCars(racers);
 				renderAt('#racers', html);
-			})
+			});
+
 	} catch (error) {
 		console.log("Problem getting tracks and racers ::", error.message)
 		console.error(error)
 	}
 }
 
+
+Element.prototype.customMatches = function (reqSelector) {
+
+	let curElement = this;
+
+	while(curElement !== null) {
+		if(curElement.matches(reqSelector)) {
+			return curElement;
+		}
+		curElement = curElement.parentElement;
+	}
+	return curElement;
+}
+
+
 function setupClickHandlers() {
+
 
 	document.addEventListener('click', function (event) {
 		const { target } = event;
@@ -51,38 +68,51 @@ function setupClickHandlers() {
 		console.log("click info ", target);
 
 		// Race track form field
-		if(target.matches(".card.track")) {
+		//const reqElement = event.checkInDom("card track");
+
+		let reqTarget = target.customMatches('.card.track');
+		if(reqTarget) {
 			console.log("there was match in track");
-			handleSelectTrack(target)
+			handleSelectTrack(reqTarget);
+			return;
 		}
 
 		// Podracer form field
-		if (target.matches('.card.podracer')) {
+		reqTarget = target.customMatches('.card.podracer');
+		if (reqTarget) {
 			console.log("there was match in podracer");
-			handleSelectPodRacer(target)
+			handleSelectPodRacer(reqTarget);
+			return;
 		}
 
 		// Submit create race form
 		if (target.matches('#submit-create-race')) {
-			event.preventDefault()
+			event.preventDefault();
+			if(!(store['track_id'] && store['player_id']))  {
+				alert("You must submit both track and race car");
+				return;
+			}
+
 			// start race
-			handleCreateRace()
+			handleCreateRace();
+			return;
 		}
 
 		// Handle acceleration click
 		if (target.matches('#gas-peddle')) {
-			handleAccelerate()
+			handleAccelerate();
+			return;
 		}
 
-	}, false)
+	}, false);
 }
 
 async function delay(ms) {
 	try {
 		return await new Promise(resolve => setTimeout(resolve, ms));
 	} catch (error) {
-		console.log("an error shouldn't be possible here")
-		console.log(error)
+		console.log("an error shouldn't be possible here");
+		console.log(error);
 	}
 }
 // ^ PROVIDED CODE ^ DO NOT REMOVE
@@ -100,7 +130,7 @@ async function handleCreateRace() {
 	console.log("The race is ", race);
 
 	// TODO - update the store with the race id
-	store['race_id'] = parseInt(race['ID'] - 1);
+	store['race_id'] = parseInt(race['ID']) - 1;
 
 	console.log("updated race_id in store is " , store['race_id']);
 
@@ -190,39 +220,39 @@ async function runCountdown() {
 }
 
 function handleSelectPodRacer(target) {
-	console.log("selected a pod", target.id)
+	console.log("selected a pod", target.id);
 
 	// remove class selected from all racer options
 	const selected = document.querySelector('#racers .selected')
 	if (selected) {
-		selected.classList.remove('selected')
+		selected.classList.remove('selected');
 	}
 
 	// add class selected to current target
-	target.classList.add('selected')
+	target.classList.add('selected');
 
 	// TODO - save the selected racer to the store
 	store['player_id'] = parseInt(target['id']);
 }
 
 function handleSelectTrack(target) {
-	console.log("selected a track", target.id)
+	console.log("selected a track", target.id);
 
 	// remove class selected from all track options
 	const selected = document.querySelector('#tracks .selected')
 	if (selected) {
-		selected.classList.remove('selected')
+		selected.classList.remove('selected');
 	}
 
 	// add class selected to current target
-	target.classList.add('selected')
+	target.classList.add('selected');
 	console.log("assiging id", target.id);
 	// TODO - save the selected track id to the store
 	store['track_id'] = parseInt(target['id']);
 }
 
 function handleAccelerate() {
-	console.log("accelerate button clicked")
+	console.log("accelerate button clicked");
 	accelerate(store['race_id'])
 		.then(() => {
 			console.log("acceleration attemp is done");
@@ -335,8 +365,8 @@ function raceProgress(positions) {
 	let userPlayer = positions.find(e => e.id === store["player_id"]);
 	userPlayer.driver_name += " (you)";
 
-	positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1)
-	let count = 1
+	positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1);
+	let count = 1;
 
 	const results = positions.map(p => {
 		return `
