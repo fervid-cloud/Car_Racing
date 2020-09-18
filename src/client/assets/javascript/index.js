@@ -98,7 +98,6 @@ function setupClickHandlers() {
             if (!(store['track_id'] && store['racer_id'])) {
 
                 alert("You must submit both track and race car");
-
                 return;
             }
 
