@@ -29,14 +29,12 @@ async function onPageLoad() {
     try {
         await getTracks()
             .then(tracks => {
-                console.log("reached at tracks then");
                 const html = renderTrackCards(tracks);
                 renderAt('#tracks', html);
             });
 
         await getRacers()
             .then((racers) => {
-                console.log("reached at car also");
                 const html = renderRacerCars(racers);
                 renderAt('#racers', html);
             });
@@ -69,15 +67,12 @@ function setupClickHandlers() {
         const {
             target
         } = event;
-        console.log("a click was there");
-        console.log("click info ", target);
 
         // Race track form field
         //const reqElement = event.checkInDom("card track");
 
         let reqTarget = target.customMatches(".card.track");
         if (reqTarget) {
-            console.log("there was match in track");
             handleSelection(reqTarget, "Track");
             return;
         }
@@ -85,7 +80,6 @@ function setupClickHandlers() {
         // Podracer form field
         reqTarget = target.customMatches('.card.podracer');
         if (reqTarget) {
-            console.log("there was match in podracer");
             handleSelection(reqTarget, "Racer");
             return;
         }
@@ -119,7 +113,6 @@ async function delay(ms) {
     try {
         return await new Promise(resolve => setTimeout(resolve, ms));
     } catch (error) {
-        console.log("an error shouldn't be possible here");
         console.log(error);
     }
 }
@@ -137,26 +130,26 @@ async function handleCreateRace() {
         racer_id,
         track_id
     } = store;
-    console.log("track id is ", track_id);
+
     // const race = TODO - invoke the API call to create the race, then save the result
     const race = await createRace(racer_id, track_id);
-    console.log("The race is ", race);
+
 
     // TODO - update the store with the race id
     store['race_id'] = parseInt(race['ID']) - 1;
 
     store['race_track_length'] = race['Track']['segments'].length;
 
-    console.log("updated race_id in store is ", store['race_id']);
+
 
     // The race has been created, now start the countdown
     // TODO - call the async function runCountdown
     await runCountdown();
 
     // TODO - call the async function startRace
-    console.log("reached here after countdown");
+
     const startRaceResponse = await startRace(store['race_id']);
-    console.log(startRaceResponse);
+
     // TODO - call the async function runRace
     await runRace(store['race_id']);
 }
@@ -169,7 +162,6 @@ function runRace(raceId) {
         const intervalTracker = setInterval(async () => {
 
             statusReponse = await getRace(raceId);
-            console.log("CURRENT POSITION IS ", statusReponse.positions);
 
             switch (statusReponse.status) {
                 case "in-progress":
@@ -181,7 +173,7 @@ function runRace(raceId) {
                     resolve(statusReponse);
                     break;
                 default:
-                    console.log("No valid statusResponse was there");
+                    alert("No valid statusResponse was there");
                     clearInterval(intervalTracker);
                     reject(statusReponse);
             }
@@ -216,7 +208,7 @@ async function runCountdown() {
             const tracker = setInterval(() => {
 
                 reqElement.innerHTML = `${--timer}`;
-                console.log(timer);
+
                 if (timer === 0) {
                     clearInterval(tracker);
                     resolve(timer);
@@ -238,33 +230,26 @@ async function runCountdown() {
 
 function handleSelection(target, type) {
     const reqClassName = `selected${type}`;
-    console.log("the traget element is", target);
-    console.log("the selected element classname is ", reqClassName)
 
     const oldClass = document.querySelector(`.${reqClassName}`);
     const oldId = document.querySelector(`#current${type}`);
-    console.log("old class is ", oldClass);
-    console.log("old Id is", oldId);
 
     if (oldClass && oldId) {
         oldClass.classList.remove(reqClassName);
         oldId.remove();
-
     }
 
     target.classList.add(reqClassName);
-    console.log("updated classList", target.classList);
+
     const html = `
                     <p id="current${type}">You Choose This ${type}</p>
 				  `;
 
     target.appendChild(stringToFragment(html));
-    console.log("updated target element is", target);
 
     // TODO - save the selected track id and racer_id to the store
     const updateProperty = `${type.toLowerCase()}_id`;
     store[updateProperty] = parseInt(target['id']);
-    console.log(`Inserting the ${updateProperty} :`, store[updateProperty]);
 
 }
 
@@ -278,7 +263,6 @@ function stringToFragment(string) {
 
 
 function handleAccelerate() {
-    console.log("accelerate button clicked");
     accelerate(store['race_id'])
         .then(() => {
             console.log("acceleration attempt is done");
@@ -297,7 +281,6 @@ function renderRacerCars(racers) {
     }
 
     const results = racers.map(renderRacerCard).join('');
-
     return `
 			${results}
 	`
@@ -330,7 +313,6 @@ function renderTrackCards(tracks) {
     }
 
     const results = tracks.map(renderTrackCard).join('')
-
     return ` 
 			${results}
 
@@ -426,9 +408,7 @@ function showFields(objectFields, position) {
     const percentage = Math.round(actualPercentage * 100) / 100;
     result.push(getColumnView(percentage));
 
-    console.log(result);
     return result.join(' ');
-
 }
 
 
@@ -451,15 +431,12 @@ function raceInProgress(positions) {
 
 
 function currentProgress(positions) {
-    console.log("In race progress , racer_id shown is", store["racer_id"]);
 
     /*   let userPlayer = positions.find(e => e.id === store["racer_id"]);
        userPlayer.driver_name += " (you)";*/
 
-
-
     const results = positions.map((element, index) => {
-        console.log("element is", element);
+
         if(element.id === store["racer_id"]) {
             element['driver_name'] += "(you)";
 
@@ -484,7 +461,6 @@ function currentProgress(positions) {
 
 function renderAt(element, html) {
     const node = document.querySelector(element)
-
     node.innerHTML = html
 }
 
@@ -512,14 +488,12 @@ function getTracks() {
     return fetch(`${SERVER}/api/tracks`)
         .then((response) => response.json())
         .then((body) => {
-            console.log("tracks are ", body);
             return body;
         })
         .catch((ex) => {
             console.log("error occured while fetching tracks in getTracks");
             console.log(ex.message);
         });
-
     // GET request to `${SERVER}/api/tracks`
 }
 
@@ -528,7 +502,6 @@ function getRacers() {
     return fetch(`${SERVER}/api/cars`)
         .then(response => response.json())
         .then((body) => {
-            console.log("cars are ", body);
             return body;
         })
         .catch(((ex) => console.log(ex.message)));
@@ -540,13 +513,13 @@ function createRace(player_id, track_id) {
         player_id,
         track_id
     }
+
     return fetch(`${SERVER}/api/races`, {
         method: 'POST',
         ...defaultFetchOpts(),
         dataType: 'jsonp',
         body: JSON.stringify(body)
     }).then((res) => {
-            console.log("going to send response");
             return res.json();
         })
         .catch(err => console.log("Problem with createRace request::", err))
@@ -554,7 +527,6 @@ function createRace(player_id, track_id) {
 
 function getRace(id) {
     // GET request to `${SERVER}/api/races/${id}`
-
     return fetch(`${SERVER}/api/races/${id}`)
         .then(res => res.json())
         .catch((ex) => {
@@ -567,8 +539,7 @@ function startRace(id) {
     return fetch(`${SERVER}/api/races/${id}/start`, {
         method: 'POST',
         ...defaultFetchOpts()
-    }) //.then(res => res.json())
-        .catch(err => console.log("Problem with getRace request::", err))
+    }).catch(err => console.log("Problem with getRace request::", err))
 }
 
 function accelerate(id) {
@@ -580,7 +551,6 @@ function accelerate(id) {
         console.log("error occured while accelerating the car");
         console.log(ex.message);
     })
-
     // POST request to `${SERVER}/api/races/${id}/accelerate`
     // options parameter provided as defaultFetchOpts
     // no body or datatype needed for this request
