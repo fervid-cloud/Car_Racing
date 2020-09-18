@@ -33,8 +33,7 @@ form li {
     border: 1px solid #fbf5f5;
     cursor: pointer;
     transition: all .6s;
-    min-height: 200px;
-    min-height: 200px;
+    min-height: 100px;
     color: aqua;
     background-color: cadetblue;
 

@@ -9,7 +9,7 @@ const store = {
     race_track_length: undefined
 }
 
-const countDownTime = 5;
+const countDownTime = 3;
 
 // We need our javascript to wait until the DOM is loaded
 document.addEventListener("DOMContentLoaded", async function () {
@@ -94,9 +94,11 @@ function setupClickHandlers() {
         reqTarget = target.customMatches('#submit-create-race');
         if (reqTarget) {
             event.preventDefault();
+
             if (!(store['track_id'] && store['racer_id'])) {
+
                 alert("You must submit both track and race car");
-                // add my own pop up
+
                 return;
             }
 
@@ -280,7 +282,7 @@ function handleAccelerate() {
     console.log("accelerate button clicked");
     accelerate(store['race_id'])
         .then(() => {
-            console.log("acceleration attemp is done");
+            console.log("acceleration attempt is done");
         });
     // TODO - Invoke the API call to accelerate
 }
@@ -428,33 +430,11 @@ function showFields(objectFields, position) {
     console.log(result);
     return result.join(' ');
 
-
-    const progressObject = {
-        acceleration: 10,
-        driver_name: "Racer 3",
-        handling: 6,
-        id: 3,
-        segment: 2,
-        speed: 40,
-        top_speed: 500
-    }
-
-    const finishedObject = {
-        acceleration: 10,
-        driver_name: "Racer 3 (you)",
-        final_position: 1,
-        handling: 6,
-        id: 3,
-        segment: 201,
-        speed: 360,
-        top_speed: 500
-    }
-
-
 }
 
 
-function raceInProgress(position) {
+function raceInProgress(positions) {
+    positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1);
 
     return `
         <h2>Race Progress</h2>
@@ -463,9 +443,9 @@ function raceInProgress(position) {
 				<th>Race Position</th>
 				<th>Racer Name</th>
 				<th>Current Speed</th>
-				<th>Race Completion</th>
+				<th>Race Completion(%)</th>
 			</tr>
-             ${currentProgress(position)}
+             ${currentProgress(positions)}
         </table>
     `;
 }
@@ -477,7 +457,7 @@ function currentProgress(positions) {
     /*   let userPlayer = positions.find(e => e.id === store["racer_id"]);
        userPlayer.driver_name += " (you)";*/
 
-    positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1);
+
 
     const results = positions.map((element, index) => {
         console.log("element is", element);
@@ -521,7 +501,7 @@ function defaultFetchOpts() {
         mode: 'cors',
         headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': SERVER
+            'Access-Control-Allow-Origin': SERVER,
         }
     }
 }
@@ -556,9 +536,9 @@ function getRacers() {
     // GET request to `${SERVER}/api/cars`
 }
 
-function createRace(racer_id, track_id) {
+function createRace(player_id, track_id) {
     const body = {
-        racer_id,
+        player_id,
         track_id
     }
     return fetch(`${SERVER}/api/races`, {
@@ -566,8 +546,7 @@ function createRace(racer_id, track_id) {
         ...defaultFetchOpts(),
         dataType: 'jsonp',
         body: JSON.stringify(body)
-    })
-        .then((res) => {
+    }).then((res) => {
             console.log("going to send response");
             return res.json();
         })
