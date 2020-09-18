@@ -27,7 +27,8 @@
     position: fixed;
     top: var(--headerHeight);
     height: var(--middleHeight);
-    background-color: #225475;
+    /*background-color: #225475;*/
+    background-color: darkslategray;
     opacity: 0.54;
     display: flex;
     width: 100vw;
@@ -47,7 +48,7 @@
 }
 #announcement #welcomeText {
     font-size: 55px;
-    color: whitesmoke;
+    color: wheat;
     font-family: fantasy;
 }
 

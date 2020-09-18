@@ -84,7 +84,6 @@ form li h3 {
     background-color: green;
     cursor: pointer;
     border-radius: 4px;
-    border-color: 1px solid green;
     color: white;
     font-size: 20px;
     text-transform: uppercase;
@@ -97,10 +96,14 @@ form li h3 {
     border-radius: 15px;
 }
 
+
+
 .button:active {
     font-size: 21px;
+    backgound-color: yellow;
 }
 
 .button:hover {
     background-color: darkblue;
 }
+
