@@ -171,13 +171,13 @@ function runRace(raceId) {
                     renderAt("#display_panel", resultsView(statusReponse.positions));
                     clearInterval(intervalTracker);
                     resolve(statusReponse);
+                    alert("Race is finished");
                     break;
                 default:
                     alert("No valid statusResponse was there");
                     clearInterval(intervalTracker);
                     reject(statusReponse);
             }
-
         }, 500);
 
     }).catch((ex) => {
@@ -263,10 +263,22 @@ function stringToFragment(string) {
 
 
 function handleAccelerate() {
-    accelerate(store['race_id'])
-        .then(() => {
-            console.log("acceleration attempt is done");
-        });
+    if(store['race_id']) {
+        getRace(store['race_id'])
+            .then((statusResponse) => {
+                if(statusResponse.status === "unstarted") {
+                    alert("Race has not started yet, please wait for timer countdown");
+                    return;
+                }
+                accelerate(store['race_id'])
+                    .then(() => {
+                        console.log("acceleration was added to racer speed");
+                    });
+
+            })
+        return;
+    }
+    alert("Race has not started yet, please wait for timer countdown");
     // TODO - Invoke the API call to accelerate
 }
 
