@@ -1,0 +1,100 @@
+#bottom {
+    position: absolute;
+    background-image: url("../images/race.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    height: 89%;
+    width: 100%;
+    top: 11%;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+   
+/*    justify-content: center;*/
+    padding-top:15px;
+}
+
+
+
+#race {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+}
+
+
+header {
+    margin-bottom: 15px;
+    padding: 5px 30px;
+    font-family: fantasy;
+    background-color: darkolivegreen;
+    color: wheat;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+/*    display: inline-block;*/
+    box-shadow: 4px -4px 15px 0px #FF1F1F, 12px -11px 7px 0px #FF9376, 20px -5px 7px 0px #FFE264, 20px 6px 7px 0px #F6FF33, 13px 12px 17px 0px #FF9527, 2px 17px 17px 0px #FF0000, -9px 21px 18px 0px #FFF212, -9px 6px 11px 0px #FF0808, -11px -9px 11px 0px #FFFA17, -11px -9px 11px 0px #FFFA17, 11px 5px 15px 5px rgba(0, 0, 0, 0);
+    box-shadow: 4px -4px 15px 0px #FF1F1F, 12px -11px 7px 0px #FF9376, 20px -5px 7px 0px #FFE264, 20px 6px 7px 0px #F6FF33, 13px 12px 17px 0px #FF9527, 2px 17px 17px 0px #FF0000, -9px 21px 18px 0px #FFF212, -9px 6px 11px 0px #FF0808, -11px -9px 11px 0px #FFFA17, -11px -9px 11px 0px #FFFA17, 11px 5px 15px 5px rgba(0, 0, 0, 0);
+    align-self: center;
+}
+
+
+
+
+
+#display_panel {
+    /*    background: inherit;*/
+    width: 95%;
+    border: 2px solid blue;
+    background-color: rgba(0, 4, 255, 0.27);
+    display: flex;
+    justify-content: space-around;
+    min-height: 80%;
+    border-radius: 15px;
+    padding: 10px 10px;
+    margin: 20px;
+    
+    /*    align-items: center;*/
+
+}
+
+#big-numbers {
+    font-weight: bolder;
+    font-size: 70px;
+}
+
+#footer {
+    color: white;
+    background-color:black;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 10%;
+}
+
+
+#footer #footerText {
+    font-family:cursive;
+    font-size:23px;
+}
+
+
+li {
+    list-style-type: none;
+    font-family:fantasy;
+    font-size: 22px;
+    
+}
+
+li:hover {
+    cursor: pointer;
+    color: burlywood;
+    
+}
+
+a, a:hover, a:focus, a:active {
+      color: inherit;
+      text-decoration: none;
+        font-family: inherit;
+}

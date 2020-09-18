@@ -1,0 +1,106 @@
+form ul {
+    display: flex;
+
+    
+    flex-wrap: wrap;
+}
+
+#create-race h1,h2,h3,h4,h5,h6,h7 {
+    text-align: center;
+}
+
+#createHeading {
+    color: blue;
+    font-family:monospace;
+    font-size: 30px;
+}
+
+form p {
+    color:antiquewhite;
+    margin-left: 10px;
+    margin-top: 25px;
+    font-size: 25px;
+}
+
+form li {
+    border-radius: 6px;
+    -webkit-box-shadow: 5px 7px 5px 0px rgba(237, 230, 237, 1);
+    -moz-box-shadow: 5px 7px 5px 0px rgba(237, 230, 237, 1);
+    box-shadow: 5px 7px 5px 0px rgba(237, 230, 237, 1);
+    max-width: 300px;
+    width: calc(100%/4);
+    padding: 20px;
+    border: 1px solid #fbf5f5;
+    cursor: pointer;
+    transition: all .6s;
+    min-height: 200px;
+    min-height: 200px;
+    color: aqua;
+    background-color: cadetblue;
+
+    margin: 10px;
+
+}
+
+
+hr {
+    margin-top: 20px;
+}
+
+#currentTrack,
+#currentRacer {
+    text-align: center;
+}
+
+
+
+form li:hover {
+    box-shadow: none;
+    border: 1px solid rgb(109, 233, 23);
+    background-color: orangered;
+}
+
+form li.selectedTrack {
+    border: 1px solid rgb(109, 233, 23);
+    background-color: green;
+}
+
+form li.selectedRacer {
+    border: 1px solid rgb(109, 233, 23);
+    background-color: midnightblue;
+}
+
+form li h3 {
+    border-bottom: 1px solid #545454;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+
+}
+
+
+.button {
+    width: 250px;
+    padding: 20px 10px;
+    background-color: green;
+    cursor: pointer;
+    border-radius: 4px;
+    border-color: 1px solid green;
+    color: white;
+    font-size: 20px;
+    text-transform: uppercase;
+    margin: 20px 0;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    align-self: center;
+    outline: none;
+    border-radius: 15px;
+}
+
+.button:active {
+    font-size: 21px;
+}
+
+.button:hover {
+    background-color: darkblue;
+}

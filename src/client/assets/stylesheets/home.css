@@ -1,27 +1,114 @@
-/* HOME PAGE SPECIFIC STYLES */
-
-/* -------------------  MOBILE  --------------------- */
-
-
-/* -------------------  TABLET  --------------------- */
-@media (min-width: 768px) {
+* {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Anton', sans-serif;
+    /*    overflow: hidden;*/
 }
 
-/* -------------------  DESKTOP  -------------------- */
+:root {
+    --headerHeight: 11%;
+    --footerHeight: 9%;
+    --middleHeight: calc(100% - var(--headerHeight) - var(--footerHeight));
+}
 
-@media (min-width: 1224px) {
-    header {
-        background-image: url("../images/home.jpg");
-    }
-    footer {
-        background-color:cornflowerblue;
-    }
-    main {
-        background-color:blanchedalmond;
+#homeBody {
+    /*    position: relative;*/
+}
+
+
+#raceVideo {
+    position: fixed;
+    bottom: -7%;
+}
+
+
+#middle {
+    position: fixed;
+    top: var(--headerHeight);
+    height: var(--middleHeight);
+    background-color: #225475;
+    opacity: 0.54;
+    display: flex;
+    width: 100vw;
+    overflow: auto;
+    /*    justify-content: center;*/
+}
+
+@media( max-width: 400px) {
+
+    #middle {
+        top: 25%;
     }
 }
 
-/* -------------------  LARGE SCREENS  -------------- */
+#announcement p {
+    margin-bottom: 12px;
+}
+#announcement #welcomeText {
+    font-size: 55px;
+    color: whitesmoke;
+    font-family: fantasy;
+}
 
-@media (min-width: 1824px) {
+#announcement > #centerText {
+    color: white;
+    font-size: 30px;
+    font-family: serif;
+}
+
+#announcement #startRace{
+    font-size: 55px;
+    color: orangered;
+    /*    font-weight: 700;*/
+    font-family:fantasy;
+}
+
+#announcement #startRace:hover {
+    color: aqua;
+}
+
+#footer {
+
+    position: fixed;
+    width: 100%;
+    bottom: 0px;
+    background-color: black;
+    height: var(--footerHeight);
+    color: snow;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+
+}
+
+
+#footer #footerText {
+    font-family:cursive;
+    font-size:23px;
+}
+
+
+li {
+    list-style-type: none;
+    font-family:fantasy;
+    font-size: 22px;
+
+}
+
+li:hover {
+    cursor: pointer;
+    color: burlywood;
+
+}
+
+a, a:hover, a:focus, a:active {
+    color: inherit;
+    text-decoration: none;
+    font-family: inherit;
+}
+
+#middleContent {
+    margin: auto;
 }

@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --delay 500ms ./src/server/index.js"
+    "start": "ORIGIN_ALLOWED=http://localhost:3000 ./bin/server-linux & nodemon --delay 1000ms ./src/server/index.js"
   },
   "dependencies": {
     "axios": "^0.20.0",

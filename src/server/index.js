@@ -16,11 +16,19 @@ app.use('/', express.static(path.join(__dirname, '../client')))
 
 // API calls ------------------------------------------------------------------------------------
 app.get('/', async (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/pages/home.html'));
-})
+    const newPath = path.join(__dirname, '../client/pages/home.html');
+    console.log(newPath);
+    console.log("current directory is:", __dirname);
+    res.sendFile(newPath);
+});
 
 app.get('/race', async (req, res) => {
     res.sendFile(path.join(__dirname, '../client/pages/race.html'));
-})
+});
+
+app.get("/progress", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/pages/progress.html"));
+});
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

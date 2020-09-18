@@ -3,26 +3,53 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Welcome to the Pod Racer Simulator</title>
-    <link rel="stylesheet" href="assets/stylesheets/reset.css">
-    <link rel="stylesheet" href="assets/stylesheets/index.css">
+    <title>Car Racing</title>
+    <link rel="icon" href="logo.png" type="image/icon type">
     <link rel="stylesheet" href="assets/stylesheets/home.css">
+    <link rel="stylesheet" href="assets/stylesheets/header.css">
 </head>
 
-<body>
-    <header>
-        <h1>Welcome to Pod Racer Sim </h1>
-    </header>
-    <main>
-        <section>
-            <h2>Become a Pod Racer Champion</h2>
-            <h3>Start your sim now with just two simple questions</h3>
-            <a class="button" href="/race">Start My Race</a>
-        </section>
-    </main>
-    <footer></footer>
-</body>
+<body id=homeBody>
+<video id="raceVideo" autoplay muted loop>
+    <source src="assets/images/home.webm" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
 
-</html>
+
+<div id="header">
+    <div id="headerInside">
+
+        <div id="header_logo">
+            <a href="/"><img style="margin-top: 5px" src="assets/images/logo.png"></a>
+        </div>
+
+        <div id="sections">
+            <ul>
+                <li>About</li>
+            </ul>
+        </div>
+
+
+    </div>
+</div>
+
+<div id="middle">
+
+    <div id="middleContent">
+        <div id="announcement">
+            <p id="welcomeText" style="text-align: center">Welcome to the Racing Game</p>
+            <p id="centerText" style="text-align: center">Start your race now with just two simple questions</p>
+            <p id="startRace" style="text-align: center"><a href="/race">Start My Race</a></p>
+        </div>
+    </div>
+
+</div>
+
+<div id="footer">
+    <div id="footer_logo">
+        <!--            <img src="footer_logo.png">-->
+        <p id="footerText">RACING GAME</p>
+    </div>
+</div>
+
+</body></html>
