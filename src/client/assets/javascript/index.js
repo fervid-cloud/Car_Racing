@@ -40,8 +40,7 @@ async function onPageLoad() {
             });
 
     } catch (error) {
-        console.log("Problem getting tracks and racers ::", error.message)
-        console.error(error)
+        alert("Error occured while fetching both available racers and tracks, please try after some time");
     }
 }
 
@@ -62,50 +61,47 @@ Element.prototype.customMatches = function (reqSelector) {
 
 function setupClickHandlers() {
 
-
     document.addEventListener('click', function (event) {
-        const {
-            target
-        } = event;
+        try {
+            const {target} = event;
 
-        // Race track form field
-        //const reqElement = event.checkInDom("card track");
-
-        let reqTarget = target.customMatches(".card.track");
-        if (reqTarget) {
-            handleSelection(reqTarget, "Track");
-            return;
-        }
-
-        // Podracer form field
-        reqTarget = target.customMatches('.card.podracer');
-        if (reqTarget) {
-            handleSelection(reqTarget, "Racer");
-            return;
-        }
-
-        // Submit create race form
-        reqTarget = target.customMatches('#submit-create-race');
-        if (reqTarget) {
-            event.preventDefault();
-
-            if (!(store['track_id'] && store['racer_id'])) {
-
-                alert("You must submit both track and race car");
+            // Race track form field
+            let reqTarget = target.customMatches(".card.track");
+            if (reqTarget) {
+                handleSelection(reqTarget, "Track");
                 return;
             }
 
-            // start race
-            handleCreateRace();
-            return;
-        }
+            // Podracer form field
+            reqTarget = target.customMatches('.card.podracer');
+            if (reqTarget) {
+                handleSelection(reqTarget, "Racer");
+                return;
+            }
 
-        // Handle acceleration click
-        if (target.matches('#gas-peddle')) {
-            handleAccelerate();
-            return;
-        }
+            // Submit create race form
+            reqTarget = target.customMatches('#submit-create-race');
+            if (reqTarget) {
+                event.preventDefault();
 
+                if (!(store['track_id'] && store['racer_id'])) {
+                    alert("You must submit both track and race car");
+                    return;
+                }
+
+                // start race
+                handleCreateRace();
+                return;
+            }
+
+            // Handle acceleration click
+            if (target.matches('#gas-peddle')) {
+                handleAccelerate();
+                return;
+            }
+        } catch (ex) {
+            alert("Some Error occured while starting the race , race");
+        }
     }, false);
 }
 
@@ -118,40 +114,31 @@ async function delay(ms) {
 }
 
 
-// ^ PROVIDED CODE ^ DO NOT REMOVE
 
-// This async function controls the flow of the race, add the logic and error handling
 async function handleCreateRace() {
-    // render starting UI
-    renderAt('#bottom', renderRaceStartView(store["track_id"]));
 
-    // TODO - Get racer_id and track_id from the store
-    const {
-        racer_id,
-        track_id
-    } = store;
+    try {
+        // render starting UI
+        renderAt('#bottom', renderRaceStartView(store["track_id"]));
 
-    // const race = TODO - invoke the API call to create the race, then save the result
-    const race = await createRace(racer_id, track_id);
+        const {racer_id, track_id} = store;
 
+        const race = await createRace(racer_id, track_id);
 
-    // TODO - update the store with the race id
-    store['race_id'] = parseInt(race['ID']) - 1;
+        store['race_id'] = parseInt(race['ID']) - 1;
 
-    store['race_track_length'] = race['Track']['segments'].length;
+        store['race_track_length'] = race['Track']['segments'].length;
 
+        // The race has been created, now starting the countdown
 
+        await runCountdown();
 
-    // The race has been created, now start the countdown
-    // TODO - call the async function runCountdown
-    await runCountdown();
+        await startRace(store['race_id']);
 
-    // TODO - call the async function startRace
-
-    const startRaceResponse = await startRace(store['race_id']);
-
-    // TODO - call the async function runRace
-    await runRace(store['race_id']);
+        await runRace(store['race_id']);
+    } catch(ex) {
+        alert("There occured some error while creating and starting the race, please try after some time");
+    }
 }
 
 function runRace(raceId) {
@@ -181,21 +168,8 @@ function runRace(raceId) {
         }, 500);
 
     }).catch((ex) => {
-        console.log("some error occured while starting and running the race");
-        console.log(ex.message);
+        alert("Some Error occured after race has started, please try after some time");
     })
-    // TODO - use Javascript's built in setInterval method to get race info every 500ms
-    /*
-        TODO - if the race info status property is "in-progress", update the leaderboard by calling:
-        renderAt('#leaderBoard', raceProgress(res.positions))
-    */
-    /*
-        TODO - if the race info status property is "finished", run the following:
-        clearInterval(raceInterval) // to stop the interval from repeating
-        renderAt('#race', resultsView(res.positions)) // to render the results view
-        reslove(res) // resolve the promise
-    */
-    // remember to add error handling for the Promise
 }
 
 async function runCountdown() {
@@ -218,38 +192,38 @@ async function runCountdown() {
 
         });
     } catch (error) {
-        console.log(error);
+       alert("Some Error occured while countdown was in progress, please try after some time");
     }
-
-    // TODO - use Javascript's built in setInterval method to count down once per second
-    // run this DOM manipulation to decrement the countdown for the user
-    // TODO - if the countdown is done, clear the interval, resolve the promise, and return
 }
 
 
 
 function handleSelection(target, type) {
-    const reqClassName = `selected${type}`;
 
-    const oldClass = document.querySelector(`.${reqClassName}`);
-    const oldId = document.querySelector(`#current${type}`);
+    try {
+        const reqClassName = `selected${type}`;
 
-    if (oldClass && oldId) {
-        oldClass.classList.remove(reqClassName);
-        oldId.remove();
-    }
+        const oldClass = document.querySelector(`.${reqClassName}`);
+        const oldId = document.querySelector(`#current${type}`);
 
-    target.classList.add(reqClassName);
+        if (oldClass && oldId) {
+            oldClass.classList.remove(reqClassName);
+            oldId.remove();
+        }
 
-    const html = `
+        target.classList.add(reqClassName);
+
+        const html = `
                     <p id="current${type}">You Choose This ${type}</p>
 				  `;
 
-    target.appendChild(stringToFragment(html));
+        target.appendChild(stringToFragment(html));
 
-    // TODO - save the selected track id and racer_id to the store
-    const updateProperty = `${type.toLowerCase()}_id`;
-    store[updateProperty] = parseInt(target['id']);
+        const updateProperty = `${type.toLowerCase()}_id`;
+        store[updateProperty] = parseInt(target['id']);
+    } catch(ex) {
+        alert("Some error occured while selecting the choice, please try after some time");
+    }
 
 }
 
@@ -260,9 +234,8 @@ function stringToFragment(string) {
 }
 
 
-
-
 function handleAccelerate() {
+
     if(store['race_id']) {
         getRace(store['race_id'])
             .then((statusResponse) => {
@@ -278,12 +251,11 @@ function handleAccelerate() {
             })
         return;
     }
+
     alert("Race has not started yet, please wait for timer countdown");
-    // TODO - Invoke the API call to accelerate
 }
 
 // HTML VIEWS ------------------------------------------------
-// Provided code - do not remove
 
 function renderRacerCars(racers) {
     if (!racers.length) {
@@ -364,7 +336,7 @@ function renderRaceStartView(track_id) {
 			</section>
 
 			<section id="accelerate">
-				<h2>Hint</h2>
+				<h2>Instruction</h2>
 				<p>Click the button as fast as you can to make your racer go faster!</p>
 				<button id="gas-peddle">Click Me To Win!</button>
 			</section>
@@ -444,9 +416,6 @@ function raceInProgress(positions) {
 
 function currentProgress(positions) {
 
-    /*   let userPlayer = positions.find(e => e.id === store["racer_id"]);
-       userPlayer.driver_name += " (you)";*/
-
     const results = positions.map((element, index) => {
 
         if(element.id === store["racer_id"]) {
@@ -476,9 +445,6 @@ function renderAt(element, html) {
     node.innerHTML = html
 }
 
-// ^ Provided code ^ do not remove
-
-
 // API CALLS ------------------------------------------------
 
 const SERVER = 'http://localhost:8000';
@@ -493,7 +459,6 @@ function defaultFetchOpts() {
     }
 }
 
-// TODO - Make a fetch call (with error handling!) to each of the following API endpoints
 
 function getTracks() {
 
