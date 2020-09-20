@@ -69,7 +69,6 @@ section#accelerate button {
     flex-direction: column;
     align-items: center;
     width: 35%;
-    
 /*    align-self: center;*/
 
 }
@@ -93,6 +92,10 @@ section h1, h2 {
     background-color: coral;
 }
 
+
+
+
+
 /**********************************************************************************************************************/
 /* for after race completion result */
 
@@ -100,7 +103,8 @@ section h1, h2 {
 #results {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
 /*    height: 100%;*/
 }
 
@@ -109,6 +113,7 @@ section h1, h2 {
     font-size: 25px;
     font-family:fantasy; 
     color: azure;
+    padding: 20px;
 }
 
 #results div:hover {

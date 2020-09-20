@@ -1,0 +1,101 @@
+/***************************************************************************************************************************/
+/* for race UI  */
+
+
+:root {
+    --carHeight:  40px;
+    --carWidth: 20px;
+    --commonRadius: 6px;
+}
+#leaderBoard {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+
+}
+
+#raceArea {
+    display: flex;
+    background-color: darkcyan;
+    margin-top: 10px;
+    justify-content: space-around;
+    padding: 15px 0px;
+    border-radius: 15px;
+    /*padding: 20px 0px;*/
+    /*height: 100%;*/
+}
+
+.carInfoView li, progressView p{
+    font-family: 'Anton', sans-serif;
+    font-size: 15px;
+}
+
+.trackView {
+    background-color: #FF9376;
+    border-radius: var(--commonRadius);
+    /*height: 100%;*/
+}
+
+.mainTrack {
+    position: relative;
+    /*height: 90%; !*this height is actually perentage of it's parent which is equal to  (sum of height of all non-empty content*/
+    /*                taking elements, since it's parent has*/
+    /*                *!*/
+
+    height: 300px;
+    min-width: 80px;
+    /*width: 100%; because div increase according to the size of it's max width or height or both child size and stretches
+        other with it
+     */
+
+}
+
+.progressView {
+
+    background-color: bisque;
+    border-top-left-radius: var(--commonRadius);
+    border-top-right-radius: var(--commonRadius);
+
+    /*background-color: cadetblue;*/
+}
+
+.progressView p {
+    text-align: center;
+}
+
+
+.carView {
+    background-image: url("../images/race_car.png");
+    background-size: contain;
+    position: absolute;
+    width: var(--carWidth);
+    height: var(--carHeight);
+    /*background-color: olivedrab;*/
+    /*border-radius: 10px;*/
+    left: 0;
+    right: 0;
+    margin:auto;
+    top:100%;
+}
+
+
+
+.carStart {
+    height: calc(var(--carHeight) + 5px);
+}
+
+.carInfoView {
+    background-color: bisque;
+    border-bottom-left-radius: var(--commonRadius);
+    border-bottom-right-radius: var(--commonRadius);
+}
+
+.carInfoView ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.myCar {
+    background-color: darkseagreen;
+}

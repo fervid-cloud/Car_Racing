@@ -106,3 +106,7 @@ form li h3 {
     background-color: darkblue;
 }
 
+
+.card.podracer p {
+    font-size: 20px;
+}

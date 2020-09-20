@@ -30,5 +30,8 @@ app.get("/progress", (req, res) => {
     res.sendFile(path.join(__dirname, "../client/pages/progress.html"));
 });
 
+app.get("/about", (req, res) => {
+    return res.redirect("https://github.com/fervid-cloud/Car_Racing/blob/master/README.md");
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

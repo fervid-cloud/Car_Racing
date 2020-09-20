@@ -1,46 +1,5 @@
-* {
-    box-sizing: border-box;
-    margin: 0px;
-    padding: 0px;
-    font-family: 'Anton', sans-serif;
-    /*    overflow: hidden;*/
-}
-
-:root {
-    --headerHeight: 11%;
-    --footerHeight: 9%;
-    --middleHeight: calc(100% - var(--headerHeight) - var(--footerHeight));
-}
-
-#homeBody {
-    /*    position: relative;*/
-}
-
-
-#raceVideo {
-    position: fixed;
-    bottom: -7%;
-}
-
-
-#middle {
-    position: fixed;
-    top: var(--headerHeight);
-    height: var(--middleHeight);
-    /*background-color: #225475;*/
+#bottom {
     background-color: darkslategray;
-    opacity: 0.54;
-    display: flex;
-    width: 100vw;
-    overflow: auto;
-    /*    justify-content: center;*/
-}
-
-@media( max-width: 400px) {
-
-    #middle {
-        top: 25%;
-    }
 }
 
 #announcement p {
@@ -67,27 +26,6 @@
 
 #announcement #startRace:hover {
     color: aqua;
-}
-
-#footer {
-
-    position: fixed;
-    width: 100%;
-    bottom: 0px;
-    background-color: black;
-    height: var(--footerHeight);
-    color: snow;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-
-}
-
-
-#footer #footerText {
-    font-family:cursive;
-    font-size:23px;
 }
 
 

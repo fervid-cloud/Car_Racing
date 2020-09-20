@@ -1,26 +1,12 @@
+
 #bottom {
-    position: absolute;
     background-image: url("../images/race.jpg");
     background-size: cover;
     background-attachment: fixed;
-    height: 89%;
-    width: 100%;
-    top: 11%;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-   
-/*    justify-content: center;*/
-    padding-top:15px;
 }
 
 
 
-#race {
-    position: relative;
-    height: 100vh;
-    width: 100vw;
-}
 
 
 header {
@@ -40,43 +26,21 @@ header {
 
 
 
-
-
 #display_panel {
-    /*    background: inherit;*/
     width: 95%;
     border: 2px solid blue;
     background-color: rgba(0, 4, 255, 0.27);
     display: flex;
-    justify-content: space-around;
-    min-height: 80%;
+    /*justify-content: space-around;*/
+    min-height: min-content;
     border-radius: 15px;
     padding: 10px 10px;
     margin: 20px;
-    
-    /*    align-items: center;*/
-
 }
 
 #big-numbers {
     font-weight: bolder;
     font-size: 70px;
-}
-
-#footer {
-    color: white;
-    background-color:black;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 10%;
-}
-
-
-#footer #footerText {
-    font-family:cursive;
-    font-size:23px;
 }
 
 

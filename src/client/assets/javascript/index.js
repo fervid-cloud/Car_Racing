@@ -41,8 +41,10 @@ async function onPageLoad() {
 
     } catch (error) {
         alert("Error occured while fetching both available racers and tracks, please try after some time");
+        //sending of exceptions log to server in ex (exception object)
     }
 }
+
 
 
 Element.prototype.customMatches = function (reqSelector) {
@@ -97,10 +99,10 @@ function setupClickHandlers() {
             // Handle acceleration click
             if (target.matches('#gas-peddle')) {
                 handleAccelerate();
-                return;
             }
         } catch (ex) {
             alert("Some Error occured while starting the race , race");
+            //we can send exceptions object information to server for logging and error monitoring
         }
     }, false);
 }
@@ -109,7 +111,8 @@ async function delay(ms) {
     try {
         return await new Promise(resolve => setTimeout(resolve, ms));
     } catch (error) {
-        console.log(error);
+       alert("There is some error", "please try after some time");
+        //we can send exceptions object information to server for logging and error monitoring
     }
 }
 
@@ -138,6 +141,7 @@ async function handleCreateRace() {
         await runRace(store['race_id']);
     } catch(ex) {
         alert("There occured some error while creating and starting the race, please try after some time");
+        //we can send exceptions object information to server for logging and error monitoring
     }
 }
 
@@ -145,23 +149,22 @@ function runRace(raceId) {
     return new Promise((resolve, reject) => {
 
         let statusReponse = undefined;
-
         const intervalTracker = setInterval(async () => {
 
             statusReponse = await getRace(raceId);
 
-            switch (statusReponse.status) {
+            switch (statusReponse['status']) {
                 case "in-progress":
-                    renderAt("#leaderBoard", raceInProgress(statusReponse.positions));
+                    renderAt("#leaderBoard",raceInProgress(statusReponse['positions']));
                     break;
                 case "finished":
-                    renderAt("#display_panel", resultsView(statusReponse.positions));
                     clearInterval(intervalTracker);
-                    resolve(statusReponse);
+                    renderAt("#display_panel", resultsView(statusReponse['positions']));
                     alert("Race is finished");
+                    resolve(statusReponse['status']);
                     break;
                 default:
-                    alert("No valid statusResponse was there");
+                    alert("No response from the server, please try after some time");
                     clearInterval(intervalTracker);
                     reject(statusReponse);
             }
@@ -169,12 +172,13 @@ function runRace(raceId) {
 
     }).catch((ex) => {
         alert("Some Error occured after race has started, please try after some time");
+        //we can send exceptions object information to server for logging and error monitoring
     })
 }
 
 async function runCountdown() {
     try {
-        // wait for the DOM to load
+        // waiting for the DOM to load
         await delay(1000);
         let timer = countDownTime;
         return new Promise(resolve => {
@@ -191,8 +195,9 @@ async function runCountdown() {
             }, 1000);
 
         });
-    } catch (error) {
+    } catch (ex) {
        alert("Some Error occured while countdown was in progress, please try after some time");
+        //we can send exceptions object information to server for logging and error monitoring
     }
 }
 
@@ -214,7 +219,7 @@ function handleSelection(target, type) {
         target.classList.add(reqClassName);
 
         const html = `
-                    <p id="current${type}">You Choose This ${type}</p>
+                    <p id="current${type}" style="font-size: 25px">You Choose This ${type}</p>
 				  `;
 
         target.appendChild(stringToFragment(html));
@@ -223,6 +228,7 @@ function handleSelection(target, type) {
         store[updateProperty] = parseInt(target['id']);
     } catch(ex) {
         alert("Some error occured while selecting the choice, please try after some time");
+        //we can send exceptions object information to server for logging and error monitoring
     }
 
 }
@@ -234,26 +240,39 @@ function stringToFragment(string) {
 }
 
 
+
+
 function handleAccelerate() {
 
     if(store['race_id']) {
         getRace(store['race_id'])
             .then((statusResponse) => {
+
+                console.log("The race progress is: ", store["race_completion_progress"]);
+
                 if(statusResponse.status === "unstarted") {
                     alert("Race has not started yet, please wait for timer countdown");
                     return;
+                } else if(store['racer_completion_progress'] === 100) {
+                    alert("You have already completed the Race");
+                    return;
                 }
+
                 accelerate(store['race_id'])
                     .then(() => {
                         console.log("acceleration was added to racer speed");
                     });
-
-            })
+            });
         return;
     }
 
     alert("Race has not started yet, please wait for timer countdown");
 }
+
+
+
+
+/*****************************************************************************************************************************/
 
 // HTML VIEWS ------------------------------------------------
 
@@ -331,14 +350,14 @@ function renderRaceStartView(track_id) {
 			<h1>Race: ${track_id}</h1>
 		</header>
 		<div id="display_panel">
-			<section id="leaderBoard" style="color: orange; flex-grow: 1; display: flex; flex-direction: column" >
+			<section id="leaderBoard" >
 				${renderCountdown(countDownTime)}
 			</section>
 
 			<section id="accelerate">
 				<h2>Instruction</h2>
 				<p>Click the button as fast as you can to make your racer go faster!</p>
-				<button id="gas-peddle">Click Me To Win!</button>
+				<button id="gas-peddle">Accelerate My Car!</button>
 			</section>
 		</div>
 		<div id="footer">
@@ -355,28 +374,26 @@ function resultsView(positions) {
 
     return `
         <div id="results">
-            <section id="leaderboard">
+            <section id="leaderboard" style="align-items: center">
                 <h1>Race Results</h1>
                 <table>
                     <tr id="titles">
                         <th>Race Position</th>
                         <th>Racer Name</th>
-                        <th>Current Speed</th>
-                        <th>Race Completion(%)</th>
                     </tr>
                  ${currentProgress(positions)}
                 </table>
             </section>
             
             <div>
-                <p style="text-align: center"><a href="/race">Start a new race</a></p>
+                <p style="text-align: center"><a href="/race">Race again</a></p>
             </div>
 	    </div>		
 	`;
 }
 
 
-function getColumnView(field) {
+function getLiView(field) {
     return `
         <td>${field}</td>
     `;
@@ -384,42 +401,105 @@ function getColumnView(field) {
 
 function showFields(objectFields, position) {
 
-    let result = [];
-    result.push(getColumnView(position));
-    result.push(getColumnView(objectFields['driver_name']));
-    result.push(getColumnView(objectFields['speed']));
-    const actualPercentage = (objectFields['segment'] / store['race_track_length']) * 100;
-    const percentage = Math.round(actualPercentage * 100) / 100;
-    result.push(getColumnView(percentage));
+    const result = [];
+    result.push(getLiView(position));
+    result.push(getLiView(objectFields['driver_name']));
 
     return result.join(' ');
 }
 
+function getCarInfo(objectInfo) {
 
-function raceInProgress(positions) {
-    positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1);
+   return `<ul>  <li style="display: inline-block; overflow-x: auto;">${objectInfo['driver_name']}</li>
+        <li>${objectInfo['speed']} km/h</li>
+        </ul>
+        `;
 
-    return `
-        <h2>Race Progress</h2>
-        <table>
-			<tr id="titles">
-				<th>Race Position</th>
-				<th>Racer Name</th>
-				<th>Current Speed</th>
-				<th>Race Completion(%)</th>
-			</tr>
-             ${currentProgress(positions)}
-        </table>
-    `;
 }
 
+function getView(positions) {
+    const allTracksView = positions.map((element) => {
+        const currentProgress = getProgressReport(element);
+        let carInfoView = "carInfoView"
+        if(element['id'] === store["racer_id"]) {
+            element['driver_name'] += "     (You)";
+            store['racer_completion_progress'] = currentProgress;
+            carInfoView += ` myCar`;
+
+        }
+        return ` <div class="trackView">
+            
+                    <div class="progressView">
+                        <p>${currentProgress} %</p>
+                    </div>
+                    
+                    <div class="mainTrack">
+                    
+                        <div class="carView" style="top:${100 - currentProgress}%;">
+                        </div> 
+                        
+                    </div>
+                     <div class="carStart">
+                    
+                    </div>
+                     <div class="${carInfoView}" style="font-size: 15px;">
+                            ${getCarInfo(element)}
+                     </div>
+        </div>
+        `;
+
+    });
+
+    console.log("all tracks are", allTracksView.join(' '));
+    return allTracksView.join(' ');
+}
+
+function raceInProgress(positions) {
+    // positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1);
+
+    const graphicalUI = `
+                <h1>Race Progress</h1>
+                <div id="raceArea">
+                 <div class="trackView" style="background-color: inherit;">
+            
+                    <div class="progressView" style="border-radius: 3px">
+                        <p> Race completion-> </p>
+                    </div>
+                    
+                    <div class="mainTrack" style="border: 0px">
+                    
+                    </div>
+                    <div class="carStart">
+                    
+                    </div>
+                     <div class="carInfoView" style="font-size: 15px; border-radius: 5px">
+                           <ul>
+                                 <li> Racer Name-> </li>
+                                 <li> Current Speed-> </li> 
+                           </ul>
+                     </div>
+                </div>
+                ${getView(positions)}
+    </div>`;
+
+
+    return graphicalUI;
+
+}
+
+
+function getProgressReport(objectFields) {
+    const percentageProgress = (objectFields['segment'] / store['race_track_length']) * 100;
+    return Math.round(percentageProgress * 100) / 100;
+}
 
 function currentProgress(positions) {
 
     const results = positions.map((element, index) => {
-
-        if(element.id === store["racer_id"]) {
+        const racerProgress = getProgressReport(element);
+        if(element['id'] === store["racer_id"]) {
             element['driver_name'] += "(you)";
+            store['racer_completion_progress'] = racerProgress;
 
             return `
                     <tr id="you">
@@ -445,6 +525,12 @@ function renderAt(element, html) {
     node.innerHTML = html
 }
 
+
+
+/*********************************************************************************************************************/
+
+
+
 // API CALLS ------------------------------------------------
 
 const SERVER = 'http://localhost:8000';
@@ -459,7 +545,7 @@ function defaultFetchOpts() {
     }
 }
 
-
+// GET request to `${SERVER}/api/tracks`
 function getTracks() {
 
     return fetch(`${SERVER}/api/tracks`)
@@ -468,12 +554,14 @@ function getTracks() {
             return body;
         })
         .catch((ex) => {
-            console.log("error occured while fetching tracks in getTracks");
-            console.log(ex.message);
+            alert("some error occured while fetching tracks, please try after some time");
+            //we can send exceptions object information to server for logging and error monitoring
         });
-    // GET request to `${SERVER}/api/tracks`
+
 }
 
+
+// GET request to `${SERVER}/api/cars`
 function getRacers() {
 
     return fetch(`${SERVER}/api/cars`)
@@ -481,8 +569,10 @@ function getRacers() {
         .then((body) => {
             return body;
         })
-        .catch(((ex) => console.log(ex.message)));
-    // GET request to `${SERVER}/api/cars`
+        .catch(((ex) => {
+            alert("some error occured while fetching cars, please try after some time");
+            //we can send exceptions object information to server for logging and error monitoring
+        }));
 }
 
 function createRace(player_id, track_id) {
@@ -499,16 +589,20 @@ function createRace(player_id, track_id) {
     }).then((res) => {
             return res.json();
         })
-        .catch(err => console.log("Problem with createRace request::", err))
+        .catch(err => {
+            alert("some error occured while creating the reace, please try after some time");
+            //we can send exceptions object information to server for logging and error monitoring
+        })
 }
 
+// GET request to `${SERVER}/api/races/${id}`
 function getRace(id) {
-    // GET request to `${SERVER}/api/races/${id}`
+
     return fetch(`${SERVER}/api/races/${id}`)
         .then(res => res.json())
         .catch((ex) => {
-            console.log("exception at getRace status function");
-            console.log(ex.message);
+            alert("some error occured while getting race status, please try after some time");
+            //we can send exceptions object information to server for logging and error monitoring
         });
 }
 
@@ -516,19 +610,22 @@ function startRace(id) {
     return fetch(`${SERVER}/api/races/${id}/start`, {
         method: 'POST',
         ...defaultFetchOpts()
-    }).catch(err => console.log("Problem with getRace request::", err))
+    }).catch(err => {
+        alert("some error occured while initialising the race, please try after some time");
+        //we can send exceptions object information to server for logging and error monitoring
+    });
 }
 
+// POST request to `${SERVER}/api/races/${id}/accelerate`
 function accelerate(id) {
 
     return fetch(`${SERVER}/api/races/${id}/accelerate`, {
         method: "POST",
         ...defaultFetchOpts()
     }).catch((ex) => {
-        console.log("error occured while accelerating the car");
-        console.log(ex.message);
+        alert("some error occured while accelerating the car, please try after some time");
+       //we can send exceptions object information to server for logging and error monitoring
+        
     })
-    // POST request to `${SERVER}/api/races/${id}/accelerate`
-    // options parameter provided as defaultFetchOpts
-    // no body or datatype needed for this request
+
 }
