@@ -2,14 +2,14 @@
 
 ## Project Introduction
 
-This web application is a car racing game which has been made using html, css and javascript
-The game mechanics are this: you select a player and track, the game begins and you accelerate your racer by clicking an acceleration button. As you accelerate so do the other players and the leaderboard live-updates as players change position on the track. The final view is a results page displaying the players' rankings.
+This web application is a car racing game which has been made using html, css and javascript.
+The game mechanics are this: you select a player and track, the game begins and you accelerate your racer by clicking an acceleration button. As you accelerate so do the other players and the Race UI live-updates as players change position on the track. The final view is a results page displaying the players' rankings.
 
 The game has three main views:
 
 1. The form to create a race
 
-2. The race progress view (this includes the live-updating leaderboard and acceleration button)
+2. The race progress view (this includes the live-updating Race UI and acceleration button)
 
 3. The race results view
 
