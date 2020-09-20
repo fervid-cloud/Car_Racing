@@ -95,7 +95,7 @@ function setupClickHandlers() {
             }
 
             // racer form field
-            reqTarget = target.customMatches('.card.podracer');
+            reqTarget = target.customMatches('.card.racer');
             if (reqTarget) {
                 handleSelection(reqTarget, "Racer");
                 return;
@@ -122,6 +122,7 @@ function setupClickHandlers() {
             }
         } catch (ex) {
             alert("Some Error occured while starting the race, please try again after some time");
+            //we can send exceptions object information to server for logging and error monitoring
             //we can send exceptions object information to server for logging and error monitoring
         }
     }, false);
@@ -358,7 +359,7 @@ function renderRacerCard(racer) {
     } = racer;
 
     return `
-		<li class="card podracer" id="${id}">
+		<li class="card racer" id="${id}">
 			<h3>Driver Name - ${driver_name}</h3>
 			<p>Top Speed - ${top_speed}</p>
 			<p>Acceleration - ${acceleration}</p>
@@ -661,7 +662,7 @@ function renderAt(element, html) {
 // API CALLS ------------------------------------------------
 
 
-/**
+
  const SERVER = 'http://localhost:8000';
 
 
