@@ -27,7 +27,6 @@ header {
 
 
 #display_panel {
-    width: 95%;
     border: 2px solid blue;
     background-color: rgba(0, 4, 255, 0.27);
     display: flex;
@@ -36,6 +35,18 @@ header {
     border-radius: 15px;
     padding: 10px 10px;
     margin: 20px;
+    /* since here we have not specfied the width, it is by default set to auto */
+    /* so when I did margin: 20px, I see that my width got reduced from both the left and right side why
+    It is not caused by the fact that the div is a child of another div, but by the fact that I was not
+    setting a specific width to the row div. Without a width specified, the width is auto, which means: use the
+     width of the parent, subtracted by the width of the margins, paddings etc.
+
+     so I set width to 100%, what do I see now when the margin is 20px, I see there is a horizontal scrolling bar which
+     means since my width is fixed, to get the margin specified, this div will create a space around it self specifically
+     to left and right and since more content is generated horizontally than vw, the horizontal scroll element was
+     produced
+
+     */
 }
 
 #big-numbers {
