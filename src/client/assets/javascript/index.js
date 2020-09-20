@@ -1,5 +1,7 @@
-// The store will hold all information needed globally
-
+/**
+ * holds various information frequently needed for this game player
+ * @type {{track_id: undefined, race_id: undefined, race_track_length: undefined, racer_id: undefined}}
+ */
 const store = {
     track_id: undefined,
     racer_id: undefined,
@@ -7,14 +9,27 @@ const store = {
     race_track_length: undefined
 }
 
+
+/**
+ * count down timer
+ * @type {number}
+ */
 const countDownTime = 3;
 
-//entry point for our script after DOM content is loaded
+
+/**
+ * entry point for our script after DOM content is loaded
+ */
 document.addEventListener("DOMContentLoaded", async function () {
     await onPageLoad();
     setupClickHandlers();
 })
 
+
+/**
+ * function that handles the fething of required data to user
+ * @returns {Promise<void>}
+ */
 async function onPageLoad() {
 
     /*
@@ -44,7 +59,11 @@ async function onPageLoad() {
 }
 
 
-
+/**
+ * implementation to find the ancestor element of our choice to which we want to delegate the handling of the any event
+ * @param reqSelector
+ * @returns {Element}
+ */
 Element.prototype.customMatches = function (reqSelector) {
 
     let curElement = this;
@@ -59,6 +78,9 @@ Element.prototype.customMatches = function (reqSelector) {
 }
 
 
+/**
+ * handles the different type of click made by the user
+ */
 function setupClickHandlers() {
 
     document.addEventListener('click', function (event) {
@@ -72,7 +94,7 @@ function setupClickHandlers() {
                 return;
             }
 
-            // Podracer form field
+            // racer form field
             reqTarget = target.customMatches('.card.podracer');
             if (reqTarget) {
                 handleSelection(reqTarget, "Racer");
@@ -105,6 +127,12 @@ function setupClickHandlers() {
     }, false);
 }
 
+
+/**
+ * simulate a delay of provided microseconds to user
+ * @param ms
+ * @returns {Promise<any>}
+ */
 async function delay(ms) {
     try {
         return await new Promise(resolve => setTimeout(resolve, ms));
@@ -115,7 +143,10 @@ async function delay(ms) {
 }
 
 
-
+/**
+ * handles the process of creating the race to starting the race and ui handling for race starting
+ * @returns {Promise<void>}
+ */
 async function handleCreateRace() {
 
     try {
@@ -143,6 +174,12 @@ async function handleCreateRace() {
     }
 }
 
+
+/**
+ * this function handels the live status and result of the race after race has been started
+ * @param raceId
+ * @returns {Promise<any>}
+ */
 function runRace(raceId) {
     return new Promise((resolve, reject) => {
 
@@ -174,6 +211,11 @@ function runRace(raceId) {
     })
 }
 
+
+/**
+ * this function is to simulate countdown to user
+ * @returns {Promise<any>}
+ */
 async function runCountdown() {
     try {
         // waiting for the DOM to load
@@ -200,7 +242,11 @@ async function runCountdown() {
 }
 
 
-
+/**
+ * handles the choice of user for track and car he want to choose for the race
+ * @param target
+ * @param type
+ */
 function handleSelection(target, type) {
 
     try {
@@ -231,6 +277,12 @@ function handleSelection(target, type) {
 
 }
 
+
+/**
+ *
+ * @param string
+ * @returns {DocumentFragment}
+ */
 function stringToFragment(string) {
     const renderer = document.createElement('template');
     renderer.innerHTML = string;
@@ -238,14 +290,14 @@ function stringToFragment(string) {
 }
 
 
-
+/**
+ * listener for acceleration button click
+ */
 function handleAccelerate() {
 
     if(store['race_id']) {
         getRace(store['race_id'])
             .then((statusResponse) => {
-
-
 
                 if(statusResponse.status === "unstarted") {
                     alert("Race has not started yet, please wait for timer countdown");
@@ -267,11 +319,16 @@ function handleAccelerate() {
 
 
 
-
 /*****************************************************************************************************************************/
 
 // HTML VIEWS ------------------------------------------------
 
+
+/**
+ *
+ * @param racers
+ * @returns {string}
+ */
 function renderRacerCars(racers) {
     if (!racers.length) {
         return `
@@ -285,6 +342,12 @@ function renderRacerCars(racers) {
 	`
 }
 
+
+/**
+ *
+ * @param racer
+ * @returns {string}
+ */
 function renderRacerCard(racer) {
     const {
         id,
@@ -304,6 +367,12 @@ function renderRacerCard(racer) {
 	`
 }
 
+
+/**
+ *
+ * @param tracks
+ * @returns {string}
+ */
 function renderTrackCards(tracks) {
     if (!tracks.length) {
         return `
@@ -318,6 +387,12 @@ function renderTrackCards(tracks) {
 	`
 }
 
+
+/**
+ *
+ * @param track
+ * @returns {string}
+ */
 function renderTrackCard(track) {
     const {
         id,
@@ -331,6 +406,12 @@ function renderTrackCard(track) {
 	`
 }
 
+
+/**
+ *
+ * @param count
+ * @returns {string}
+ */
 function renderCountdown(count) {
     return `
 		<h2>Race Starts In...</h2>
@@ -339,6 +420,11 @@ function renderCountdown(count) {
 }
 
 
+/**
+ *
+ * @param track_id
+ * @returns {string}
+ */
 function renderRaceStartView(track_id) {
     return `
 		<header>
@@ -364,6 +450,11 @@ function renderRaceStartView(track_id) {
 }
 
 
+/**
+ *
+ * @param positions
+ * @returns {string}
+ */
 function resultsView(positions) {
     positions.sort((a, b) => (a.final_position > b.final_position) ? 1 : -1)
 
@@ -388,12 +479,24 @@ function resultsView(positions) {
 }
 
 
+/**
+ *
+ * @param field
+ * @returns {string}
+ */
 function getLiView(field) {
     return `
         <td>${field}</td>
     `;
 }
 
+
+/**
+ *
+ * @param objectFields
+ * @param position
+ * @returns {string}
+ */
 function showFields(objectFields, position) {
 
     const result = [];
@@ -403,6 +506,12 @@ function showFields(objectFields, position) {
     return result.join(' ');
 }
 
+
+/**
+ *
+ * @param objectInfo
+ * @returns {string}
+ */
 function getCarInfo(objectInfo) {
 
    return `<ul>  <li style="display: inline-block; overflow-x: auto;">${objectInfo['driver_name']}</li>
@@ -412,6 +521,12 @@ function getCarInfo(objectInfo) {
 
 }
 
+
+/**
+ *
+ * @param positions
+ * @returns {string}
+ */
 function getView(positions) {
     const allTracksView = positions.map((element) => {
         const currentProgress = getProgressReport(element);
@@ -448,6 +563,12 @@ function getView(positions) {
     return allTracksView.join(' ');
 }
 
+
+/**
+ *
+ * @param positions
+ * @returns {string}
+ */
 function raceInProgress(positions) {
     // positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1);
 
@@ -480,11 +601,22 @@ function raceInProgress(positions) {
 }
 
 
+/**
+ *
+ * @param objectFields
+ * @returns {number}
+ */
 function getProgressReport(objectFields) {
     const percentageProgress = (objectFields['segment'] / store['race_track_length']) * 100;
     return Math.round(percentageProgress * 100) / 100;
 }
 
+
+/**
+ *
+ * @param positions
+ * @returns {string}
+ */
 function currentProgress(positions) {
 
     const results = positions.map((element, index) => {
@@ -510,11 +642,16 @@ function currentProgress(positions) {
     return results.join(' ');
 }
 
+
+/**
+ *
+ * @param element
+ * @param html
+ */
 function renderAt(element, html) {
     const node = document.querySelector(element)
     node.innerHTML = html
 }
-
 
 
 /*********************************************************************************************************************/
@@ -523,8 +660,15 @@ function renderAt(element, html) {
 
 // API CALLS ------------------------------------------------
 
-const SERVER = 'http://localhost:8000';
 
+/**
+ const SERVER = 'http://localhost:8000';
+
+
+ /* *
+ * function return object of different options for sending the request to the server
+ * @returns {{mode: string, headers: {"Access-Control-Allow-Origin": *, "Content-Type": string}}}
+ */
 function defaultFetchOpts() {
     return {
         mode: 'cors',
@@ -535,7 +679,10 @@ function defaultFetchOpts() {
     }
 }
 
-// GET request to `${SERVER}/api/tracks`
+/**
+ * GET request to `${SERVER}/api/tracks`
+ * @returns {Promise<* | void>}
+ */
 function getTracks() {
 
     return fetch(`${SERVER}/api/tracks`)
@@ -551,7 +698,10 @@ function getTracks() {
 }
 
 
-// GET request to `${SERVER}/api/cars`
+/**
+ * GET request to `${SERVER}/api/cars`
+ * @returns {Promise<* | void>}
+ */
 function getRacers() {
 
     return fetch(`${SERVER}/api/cars`)
@@ -565,6 +715,12 @@ function getRacers() {
         }));
 }
 
+/***
+ * POST request to `${SERVER}/api/races`
+ * @param player_id
+ * @param track_id
+ * @returns {Promise<Response | void>}
+ */
 function createRace(player_id, track_id) {
     const body = {
         player_id,
@@ -585,7 +741,11 @@ function createRace(player_id, track_id) {
         })
 }
 
-// GET request to `${SERVER}/api/races/${id}`
+/**
+ * GET request to `${SERVER}/api/races/${id}`
+ * @param id
+ * @returns {Promise<Response | void>}
+ */
 function getRace(id) {
 
     return fetch(`${SERVER}/api/races/${id}`)
@@ -596,6 +756,12 @@ function getRace(id) {
         });
 }
 
+
+/**
+ * POST request to `${SERVER}/api/races/${id}/start`
+ * @param id
+ * @returns {Promise<Response | void>}
+ */
 function startRace(id) {
     return fetch(`${SERVER}/api/races/${id}/start`, {
         method: 'POST',
@@ -606,7 +772,11 @@ function startRace(id) {
     });
 }
 
-// POST request to `${SERVER}/api/races/${id}/accelerate`
+/**
+ * POST request to `${SERVER}/api/races/${id}/accelerate`
+ * @param id
+ * @returns {Promise<Response | void>}
+ */
 function accelerate(id) {
 
     return fetch(`${SERVER}/api/races/${id}/accelerate`, {
@@ -615,7 +785,5 @@ function accelerate(id) {
     }).catch((ex) => {
         alert("some error occured while accelerating the car, please try after some time");
        //we can send exceptions object information to server for logging and error monitoring
-        
     })
-
 }
