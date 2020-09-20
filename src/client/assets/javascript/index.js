@@ -1,5 +1,3 @@
-// PROVIDED CODE BELOW (LINES 1 - 80) DO NOT REMOVE
-
 // The store will hold all information needed globally
 
 const store = {
@@ -11,7 +9,7 @@ const store = {
 
 const countDownTime = 3;
 
-// We need our javascript to wait until the DOM is loaded
+//entry point for our script after DOM content is loaded
 document.addEventListener("DOMContentLoaded", async function () {
     await onPageLoad();
     setupClickHandlers();
@@ -41,7 +39,7 @@ async function onPageLoad() {
 
     } catch (error) {
         alert("Error occured while fetching both available racers and tracks, please try after some time");
-        //sending of exceptions log to server in ex (exception object)
+        //we can send exceptions object information to server for logging and error monitoring
     }
 }
 
@@ -101,7 +99,7 @@ function setupClickHandlers() {
                 handleAccelerate();
             }
         } catch (ex) {
-            alert("Some Error occured while starting the race , race");
+            alert("Some Error occured while starting the race, please try again after some time");
             //we can send exceptions object information to server for logging and error monitoring
         }
     }, false);
@@ -111,7 +109,7 @@ async function delay(ms) {
     try {
         return await new Promise(resolve => setTimeout(resolve, ms));
     } catch (error) {
-       alert("There is some error", "please try after some time");
+       alert("There is some error, please try again after some time");
         //we can send exceptions object information to server for logging and error monitoring
     }
 }
@@ -241,14 +239,13 @@ function stringToFragment(string) {
 
 
 
-
 function handleAccelerate() {
 
     if(store['race_id']) {
         getRace(store['race_id'])
             .then((statusResponse) => {
 
-                console.log("The race progress is: ", store["race_completion_progress"]);
+
 
                 if(statusResponse.status === "unstarted") {
                     alert("Race has not started yet, please wait for timer countdown");
@@ -260,12 +257,11 @@ function handleAccelerate() {
 
                 accelerate(store['race_id'])
                     .then(() => {
-                        console.log("acceleration was added to racer speed");
+                        return;
                     });
             });
         return;
     }
-
     alert("Race has not started yet, please wait for timer countdown");
 }
 
@@ -341,7 +337,6 @@ function renderCountdown(count) {
 		<p id="big-numbers" style="text-align: center; margin:auto">${count}</p>
 	`
 }
-
 
 
 function renderRaceStartView(track_id) {
@@ -450,7 +445,6 @@ function getView(positions) {
 
     });
 
-    console.log("all tracks are", allTracksView.join(' '));
     return allTracksView.join(' ');
 }
 
@@ -482,9 +476,7 @@ function raceInProgress(positions) {
                 ${getView(positions)}
     </div>`;
 
-
     return graphicalUI;
-
 }
 
 
@@ -517,8 +509,6 @@ function currentProgress(positions) {
 
     return results.join(' ');
 }
-
-
 
 function renderAt(element, html) {
     const node = document.querySelector(element)
