@@ -44,6 +44,8 @@
 
     height: 300px;
     min-width: 80px;
+    border-top: 0.5px solid brown;
+    border-bottom: 0.5px solid brown;
     /*width: 100%; because div increase according to the size of it's max width or height or both child size and stretches
         other with it
      */
@@ -82,7 +84,7 @@
 
 .carStart {
     height: calc(var(--carHeight) + 5px);
-    background-color: green;
+    background-color: darkkhaki;
 }
 
 .carInfoView {

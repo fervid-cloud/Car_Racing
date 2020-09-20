@@ -588,7 +588,7 @@ function raceInProgress(positions) {
                     <div class="mainTrack" style="border: 0px">
                     
                     </div>
-                    <div class="carStart" style="background-color: inherit">
+                    <div class="carStart" style="background-color: inherit; border: 0px;">
                     
                     </div>
                      <div class="carInfoView" style="font-size: 15px; border-radius: 5px">
