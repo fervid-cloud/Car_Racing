@@ -300,10 +300,11 @@ function handleAccelerate() {
         getRace(store['race_id'])
             .then((statusResponse) => {
 
-                if(statusResponse.status === "unstarted") {
+                if(statusResponse['status'] === "unstarted") {
                     alert("Race has not started yet, please wait for timer countdown");
                     return;
-                } else if(store['racer_completion_progress'] === 100) {
+                }
+                if(store['racer_completion_progress'] === 100) {
                     alert("You have already completed the Race");
                     return;
                 }
@@ -312,6 +313,8 @@ function handleAccelerate() {
                     .then(() => {
                         return;
                     });
+                // return can be omitted from here but for learning purpose and reference for future
+
             });
         return;
     }
@@ -585,7 +588,7 @@ function raceInProgress(positions) {
                     <div class="mainTrack" style="border: 0px">
                     
                     </div>
-                    <div class="carStart">
+                    <div class="carStart" style="background-color: inherit">
                     
                     </div>
                      <div class="carInfoView" style="font-size: 15px; border-radius: 5px">

@@ -82,6 +82,7 @@
 
 .carStart {
     height: calc(var(--carHeight) + 5px);
+    background-color: green;
 }
 
 .carInfoView {
