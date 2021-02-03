@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 80;
 
 // setup the ability to see into response bodies
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -34,4 +34,4 @@ app.get("/about", (req, res) => {
     return res.redirect("https://github.com/fervid-cloud/Car_Racing/blob/master/README.md");
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`Click Car Racing App is listening on port ${port}!`))
