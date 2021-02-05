@@ -24,6 +24,10 @@ export default class RaceManager {
 
     private raceTracker : { [race_id: number ] : RaceSimulation } = {};
 
+    private TIMER_INTERVAL: number;
+
+    private frictionDeAcceleration: number;
+
     constructor() {
         this.data = jsonData;
         this.cars = this.data['cars'];
@@ -31,6 +35,8 @@ export default class RaceManager {
         this.tracks = this.data['tracks'];
         this.MaxRaceId = (1 << 30);
         this.MinRaceId = 1;
+        this.TIMER_INTERVAL = 1000;
+        this.frictionDeAcceleration = -5; //km/s
     }
 
     getCars(): any {
@@ -64,8 +70,13 @@ export default class RaceManager {
             Results: currentRaceStatus
         }
 
+        let sumTillNow = 0;
         this.raceTracker[randomRaceId] = <RaceSimulation>{
             setIntervalPointer: undefined,
+            trackSegmentPrefixSum: newRaceInfo.Track.segments.map((elementValue: number) => {
+                sumTillNow += elementValue;
+                return sumTillNow;
+            }),
             raceInfo: newRaceInfo
         };
 
@@ -95,14 +106,44 @@ export default class RaceManager {
         currentRaceSimulation.setIntervalPointer = setInterval(() => {
             const currentTime = new Date();
             let playerPositions : Position [] = currentRaceSimulation.raceInfo.Results.positions;
-            // playerPositions = playerPositions.map((element) => {
+            let raceCompletedCounter = 0;
+            playerPositions = playerPositions.map((carPosition: Position) => {
+                let { speed, segment, acceleration, top_speed } = carPosition;
+                const currentTrackSegmentLength = currentRaceSimulation.trackSegmentPrefixSum.length;
+                if (segment < currentTrackSegmentLength) {
+                    const oldSpeed = speed;
+                    const netAcceleration = acceleration - this.frictionDeAcceleration;
+                    const newSpeed = Math.max(0, oldSpeed + netAcceleration * this.TIMER_INTERVAL / 1000);
+                    const distanceTravelledForInterval = Math.max(0, oldSpeed + ((1 / 2) * netAcceleration * this.TIMER_INTERVAL / 100));
+                    const totalDistanceTravelled = distanceTravelledForInterval + (segment > 0 ? currentRaceSimulation.trackSegmentPrefixSum[segment - 1] : 0);
+                    const segmentTravelled = this.getSegmentTravelled(totalDistanceTravelled, currentRaceSimulation.trackSegmentPrefixSum);
+                    carPosition.speed = newSpeed;
+                }
+                return carPosition;
+            });
 
-            // });
-            // currentRaceSimulation.
-
-        }, 1000);
+        }, this.TIMER_INTERVAL);
 
         return null;
+    }
+
+
+    getSegmentTravelled(distanceTravelled: number, trackSegmentPrefixSum: number[]) : number {
+        let l = 0, r = trackSegmentPrefixSum.length - 1;
+
+        let segmentTravelled = 0;
+        while (l <= r) {
+
+            let mid = l + ((r - l) >> 1);
+            const sumTillnow = trackSegmentPrefixSum[mid];
+            if (distanceTravelled >= sumTillnow) {
+                segmentTravelled = mid;
+                l = mid + 1;
+            } else {
+                r = mid - 1;
+            }
+        }
+        return segmentTravelled;
     }
 
 
