@@ -385,7 +385,7 @@ function renderTrackCards(tracks) {
     }
 
     const results = tracks.map(renderTrackCard).join('')
-    return ` 
+    return `
 			${results}
 
 	`
@@ -474,11 +474,11 @@ function resultsView(positions) {
                  ${currentProgress(positions)}
                 </table>
             </section>
-            
+
             <div>
                 <p style="text-align: center"><a href="/race">Race again</a></p>
             </div>
-	    </div>		
+	    </div>
 	`;
 }
 
@@ -542,19 +542,19 @@ function getView(positions) {
 
         }
         return ` <div class="trackView">
-            
+
                     <div class="progressView">
                         <p>${currentProgress} %</p>
                     </div>
-                    
+
                     <div class="mainTrack">
-                    
+
                         <div class="carView" style="top:${100 - currentProgress}%;">
-                        </div> 
-                        
+                        </div>
+
                     </div>
                      <div class="carStart">
-                    
+
                     </div>
                      <div class="${carInfoView}" style="font-size: 15px;">
                             ${getCarInfo(element)}
@@ -580,21 +580,21 @@ function raceInProgress(positions) {
                 <h1>Race Progress</h1>
                 <div id="raceArea">
                  <div class="trackView" style="background-color: inherit;">
-            
+
                     <div class="progressView" style="border-radius: 3px">
                         <p> Race completion-> </p>
                     </div>
-                    
+
                     <div class="mainTrack" style="border: 0px">
-                    
+
                     </div>
                     <div class="carStart" style="background-color: inherit; border: 0px;">
-                    
+
                     </div>
                      <div class="carInfoView" style="font-size: 15px; border-radius: 5px">
                            <ul>
                                  <li> Racer Name-> </li>
-                                 <li> Current Speed-> </li> 
+                                 <li> Current Speed-> </li>
                            </ul>
                      </div>
                 </div>
