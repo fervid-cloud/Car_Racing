@@ -4,4 +4,4 @@ export type Nullable<T> = T | null | undefined;
 //Nullable<ReturnType<typeof setInterval>>
 //but using this in other places than this to keep type ddefinition of SetIntervalType decoupled with type definitio of Nullable type
 // for ex. see RaceSimulation model
-export type SetIntervalType = ReturnType<typeof setInterval> | null | undefined;
+export type SetIntervalType = ReturnType<typeof setInterval>;

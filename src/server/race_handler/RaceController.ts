@@ -83,7 +83,7 @@ raceController.post("/races", (req, res) => {
  */
 raceController.post("/races/:id/start", (req, res) => {
 
-    raceService.startRaceById(req.params.id, (err: Error, raceStartStatus: any) => {
+    raceService.startRaceById(parseInt(req.params.id), (err: Error, raceStartStatus: any) => {
         if (err) {
             res.send({ error: "some error occured while starting the race" });
             return;
@@ -115,7 +115,7 @@ raceController.get("/races/:id", (req: Request, res: Response) => {
  */
 raceController.post("/races/:id/accelerate", (req, res) => {
 
-    raceService.accelerateCar(req.params.id, (err: Error, accelerateCarStatus: any) => {
+    raceService.accelerateCar(parseInt(req.params.id), (err: Error, accelerateCarStatus: any) => {
         if (err) {
             // next(new Error("some error occured while accelerating the car"));
             res.send({ error: "testing" });

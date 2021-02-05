@@ -5,9 +5,10 @@ import Track from "model/Track";
 import { Service } from "typedi";
 import jsonData from '../model/data.json';
 import RaceInfo from "model/RaceInfo";
-import Position from "model/Position";
+import Position from "model/CarPositionInfo";
 import RaceSimulation from "model/RaceSimulation";
-import { Nullable } from "custom-type-definition";
+import { Nullable, SetIntervalType } from "custom-type-definition";
+import CarPositionInfo from "model/CarPositionInfo";
 
 @Service()
 export default class RaceManager {
@@ -47,25 +48,32 @@ export default class RaceManager {
         return this.tracks;
     }
 
-    createNewRace(player_id: number, track_id: number): any{
-        let randomRaceId = Math.floor(Math.random() * (this.MaxRaceId - this.MinRaceId + 1) + this.MinRaceId);
+
+
+    /**
+     *
+     * @param playerId
+     * @param trackId
+     */
+    createNewRace(playerId: number, trackId: number): any{
+        let randomRaceId = Math.floor(Math.random() * (this.MaxRaceId - this.MinRaceId + 1)) + this.MinRaceId;
 
         const currentRaceStatus: CurrentRaceStatus = {
             status: ProgressStatus.UNSTARTED,
             positions: this.cars.map((car) => {
-                return <Position> {
+                return <CarPositionInfo> {
                     ...car,
                     speed: 0,
-                    segment: 0,
+                    distanceTravelled: 0,
                 };
 
             })
         }
 
         const newRaceInfo: RaceInfo = {
-            ID: randomRaceId,
-            Track: this.tracks.filter((track) => track.id == track_id)[0],
-            PlayerID: player_id,
+            raceId: randomRaceId,
+            Track: this.tracks.filter((track) => track.id == trackId)[0],
+            hostId: playerId,
             Cars: this.cars,
             Results: currentRaceStatus
         }
@@ -73,16 +81,13 @@ export default class RaceManager {
         let sumTillNow = 0;
         this.raceTracker[randomRaceId] = <RaceSimulation>{
             setIntervalPointer: undefined,
-            trackSegmentPrefixSum: newRaceInfo.Track.segments.map((elementValue: number) => {
-                sumTillNow += elementValue;
-                return sumTillNow;
-            }),
-            raceInfo: newRaceInfo
+            raceInfo: newRaceInfo,
+            completedRaceCount: 0
         };
 
-        // carefully mind the difference of '.' and bracket notation, '.' notation search for string equivalent of variable name whereas
+        // carefully mind the  difference of '.' and bracket notation, '.' notation search for string equivalent of variable name whereas
         // bracket notation replace the variable with it's value unless the variable is a string itself
-        this.raceTracker[randomRaceId].humanPlayers[player_id] = -1;
+        this.raceTracker[randomRaceId].humanPlayers[playerId] = -1;
         return newRaceInfo;
         /**
             both typecasting and lefthandside type declaration is valid,it's just matter of preference, you can
@@ -94,71 +99,85 @@ export default class RaceManager {
     }
 
 
-    startRaceById(race_id: number, callback: Function) {
+    startRaceById(race_id: number) : boolean{
 
         const currentRaceSimulation: RaceSimulation = this.raceTracker[race_id];
         if (!currentRaceSimulation || currentRaceSimulation.setIntervalPointer) {
             throw new Error("Invalid requested for race, either race has already been started or race doesn't exists");
         }
 
-
         currentRaceSimulation.raceInfo.Results.status = ProgressStatus.IN_PROGRESS;
         currentRaceSimulation.setIntervalPointer = setInterval(() => {
-            const currentTime = new Date();
-            let playerPositions : Position [] = currentRaceSimulation.raceInfo.Results.positions;
-            let raceCompletedCounter = 0;
-            playerPositions = playerPositions.map((carPosition: Position) => {
-                let { speed, segment, acceleration, top_speed } = carPosition;
-                const currentTrackSegmentLength = currentRaceSimulation.trackSegmentPrefixSum.length;
-                if (segment < currentTrackSegmentLength) {
-                    const oldSpeed = speed;
-                    const netAcceleration = acceleration - this.frictionDeAcceleration;
-                    const newSpeed = Math.max(0, oldSpeed + netAcceleration * this.TIMER_INTERVAL / 1000);
-                    const distanceTravelledForInterval = Math.max(0, oldSpeed + ((1 / 2) * netAcceleration * this.TIMER_INTERVAL / 100));
-                    const totalDistanceTravelled = distanceTravelledForInterval + (segment > 0 ? currentRaceSimulation.trackSegmentPrefixSum[segment - 1] : 0);
-                    const segmentTravelled = this.getSegmentTravelled(totalDistanceTravelled, currentRaceSimulation.trackSegmentPrefixSum);
-                    carPosition.speed = newSpeed;
+            let playerPositions: CarPositionInfo[] = currentRaceSimulation.raceInfo.Results.positions;
+            this.shuffleArray(playerPositions);
+            playerPositions = playerPositions.map((carPositionInfo: CarPositionInfo) => {
+                let { speed, distanceTravelled, acceleration, topSpeed, id } = carPositionInfo;
+                const currentTrackLength: number = currentRaceSimulation.raceInfo.Track.length;
+
+                if (distanceTravelled < currentTrackLength) {
+                    if (currentRaceSimulation.humanPlayers[id]) {
+                        acceleration = 0;
+                    }
+
+                    const netAcceleration : number = acceleration - this.frictionDeAcceleration;
+                    const oldSpeed: number = speed;
+                    const newSpeed: number = Math.min(topSpeed, Math.max(0, oldSpeed + netAcceleration * this.TIMER_INTERVAL / 1000));
+                    const distanceTravelledForInterval: number = Math.max(0, oldSpeed + ((1 / 2) * netAcceleration * this.TIMER_INTERVAL / 100));
+                    let totalDistanceTravelled: number = distanceTravelled + distanceTravelledForInterval;
+
+                    if (totalDistanceTravelled >= currentTrackLength) {
+                        totalDistanceTravelled = currentTrackLength;
+                        carPositionInfo.finalPosition = Date.now();
+                        ++currentRaceSimulation.completedRaceCount;
+
+                        if (currentRaceSimulation.completedRaceCount == currentRaceSimulation.raceInfo.Cars.length) {
+                            clearInterval(<SetIntervalType>currentRaceSimulation.setIntervalPointer);
+                            currentRaceSimulation.raceInfo.Results.status = ProgressStatus.FINISHED;
+                        }
+                    }
+
+                    carPositionInfo.distanceTravelled = totalDistanceTravelled;
+                    carPositionInfo.speed = newSpeed;
                 }
-                return carPosition;
+
+                return carPositionInfo;
             });
 
         }, this.TIMER_INTERVAL);
 
-        return null;
+        return true;
     }
-
-
-    getSegmentTravelled(distanceTravelled: number, trackSegmentPrefixSum: number[]) : number {
-        let l = 0, r = trackSegmentPrefixSum.length - 1;
-
-        let segmentTravelled = 0;
-        while (l <= r) {
-
-            let mid = l + ((r - l) >> 1);
-            const sumTillnow = trackSegmentPrefixSum[mid];
-            if (distanceTravelled >= sumTillnow) {
-                segmentTravelled = mid;
-                l = mid + 1;
-            } else {
-                r = mid - 1;
-            }
-        }
-        return segmentTravelled;
-    }
-
 
 
     accelerateCar(raceId: string, callback: Function) {
 
     }
 
+
+
     getRaceInfoById(race_id: number): Nullable<CurrentRaceStatus> {
         const raceSimulation: RaceSimulation = this.raceTracker[race_id];
         if (!raceSimulation) {
             throw new Error(`No such race of ${race_id} exists`);
         }
-
         return raceSimulation.raceInfo.Results;
     }
+
+
+    /**
+     * shuffling through Fisher–Yates shuffle algorithm
+     * @param playerPositions
+     */
+    shuffleArray(playerPositions: Position[]) {
+        const n = playerPositions.length;
+        for (let i = n - 1; i > 0; --i) {
+            let rangeLength = i;
+            const randomIndex = Math.floor(Math.random() * rangeLength) + 0;
+            const temp = playerPositions[randomIndex];
+            playerPositions[randomIndex] = playerPositions[i];
+            playerPositions[i] = temp;
+        }
+    }
+
 
 }

@@ -14,29 +14,32 @@ export default class RaceService {
         this.raceManager = Container.get(RaceManager);
     }
 
+
     getRaceTracks(callback: Function) {
         callback(null, this.raceManager.getTracks());
 
     }
 
+
     getRaceCars(callback: Function) {
         callback(null, this.raceManager.getCars());
     }
 
-    getRaceInfoById(race_id: number): Nullable<CurrentRaceStatus> | ErrorResponse {
+
+    getRaceInfoById(raceId: number): Nullable<CurrentRaceStatus> | ErrorResponse {
         try {
-            return this.raceManager.getRaceInfoById(race_id);
+            return this.raceManager.getRaceInfoById(raceId);
         } catch (ex) {
             return this.composeError("some error while getting the info of the race", ex);
         }
     }
 
 
-    createRace(createRequestRaceInfo: {player_id: number, track_id: number}): Nullable<RaceInfo> | ErrorResponse {
+    createRace(createRequestRaceInfo: {playerId: number, trackId: number}): Nullable<RaceInfo> | ErrorResponse {
 
         try {
-            const { player_id, track_id } = createRequestRaceInfo;
-            return this.raceManager.createNewRace(player_id, track_id);
+            const { playerId, trackId } = createRequestRaceInfo;
+            return this.raceManager.createNewRace(playerId, trackId);
 
         } catch (ex) {
             return this.composeError("some error occured while creating the race", ex);
@@ -44,14 +47,30 @@ export default class RaceService {
     }
 
 
-    startRaceById(race_id: string, callback: Function) {
-
+    startRaceById(raceId: number, callback: Function) {
+        let error = null, response = null;
+        try {
+            response = this.raceManager.startRaceById(raceId);
+        } catch (ex) {
+            error = new Error("Race Couldn't be started");
+        } finally {
+            callback(error, response);
+        }
     }
 
 
-    accelerateCar(race_id: string, callback: Function) {
-
+    accelerateCar(raceId: number, callback: Function) {
+        let error = null, response = null;
+        try {
+            response = this.raceManager.startRaceById(raceId);
+        } catch (ex) {
+            error = new Error("some error occured while accelerating the car");
+        } finally {
+            callback(error, response);
+        }
     }
+
+
 
     composeError(errorMessage: string, ex: Error): ErrorResponse {
         return {

@@ -6,6 +6,6 @@ export default interface RaceSimulation {
     humanPlayers: {
         [player_id: string] : number
     };
-    trackSegmentPrefixSum: number[];
+    completedRaceCount: number;
     raceInfo: RaceInfo;
 }

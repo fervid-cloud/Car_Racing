@@ -1,8 +1,8 @@
 
 export default interface Car {
     id: number;
-    driver_name: string;
-    top_speed: number;
+    driverName: string;
+    topSpeed: number;
     acceleration: number;
     handling: number;
 }
