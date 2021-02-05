@@ -28,7 +28,7 @@ export default class RaceService {
     }
 
 
-    createRace(createRequestRaceInfo: {player_id: string, track_id: string}): Nullable<RaceInfo> | ErrorResponse {
+    createRace(createRequestRaceInfo: {player_id: number, track_id: number}): Nullable<RaceInfo> | ErrorResponse {
 
         try {
             const { player_id, track_id } = createRequestRaceInfo;
