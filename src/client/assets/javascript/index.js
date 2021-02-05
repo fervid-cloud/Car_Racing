@@ -460,7 +460,8 @@ function renderRaceStartView(track_id) {
  * @returns {string}
  */
 function resultsView(positions) {
-    positions.sort((a, b) => (a.final_position > b.final_position) ? 1 : -1)
+    //represen the final leaderboard position like 1st rank has 1 as final_position, then 2 and so on..
+    positions.sort((a, b) => (a.final_position < b.final_position) ? -1 : 1)
 
     return `
         <div id="results">

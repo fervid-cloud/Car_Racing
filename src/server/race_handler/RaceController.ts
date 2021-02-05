@@ -101,7 +101,7 @@ raceController.post("/races/:id/start", (req, res) => {
 
  */
 raceController.get("/races/:id", (req: Request, res: Response) => {
-    const raceStatus: Nullable<CurrentRaceStatus> = raceService.getRaceInfoById(req.params.id);
+    const raceStatus = raceService.getRaceInfoById(parseInt(req.params.id));
     res.send(raceStatus);
 
 });

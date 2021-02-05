@@ -1,4 +1,3 @@
-import { Nullable } from "custom-type-definition";
 import { CurrentRaceStatus } from "dto/CurrentRaceStatus";
 import { ProgressStatus } from "../enum/ProgressStatus";
 import Car from "model/Car";
@@ -8,6 +7,7 @@ import jsonData from '../model/data.json';
 import RaceInfo from "model/RaceInfo";
 import Position from "model/Position";
 import RaceSimulation from "model/RaceSimulation";
+import { Nullable } from "custom-type-definition";
 
 @Service()
 export default class RaceManager {
@@ -22,7 +22,7 @@ export default class RaceManager {
 
     private MinRaceId: number;
 
-    private raceTracker : any = {};
+    private raceTracker : { [race_id: number ] : RaceSimulation } = {};
 
     constructor() {
         this.data = jsonData;
@@ -69,24 +69,23 @@ export default class RaceManager {
             raceInfo: newRaceInfo
         };
 
-        // carefully mind the difference of . and bracket notation . notation search for string equivalent of variable whereas
+        // carefully mind the difference of '.' and bracket notation, '.' notation search for string equivalent of variable name whereas
         // bracket notation replace the variable with it's value unless the variable is a string itself
-         this.raceTracker[randomRaceId].humanPlayers[player_id] = true;
+        this.raceTracker[randomRaceId].humanPlayers[player_id] = -1;
         return newRaceInfo;
         /**
-            both typecasting and lefthandside type declaration is valid, it just a matter of preference
-            it's just matter of preference, you can use <RaceSimulation> at the right hand side of assignment
-            or while returning the object which is typecasting the object to force it to behave like RaceSimulation
-            (so now typescript will keep the checks of properties for us), and I used the type check for the variable
-            that is keeping the reference of the object, so again typescript will make sure that variable can only
-            contain reference of specified type and keep properties of assigned object in it's check
+            both typecasting and lefthandside type declaration is valid,it's just matter of preference, you can
+            use <RaceSimulation> at the right hand side of assignmentor while returning the object which is typecasting the
+            object to force it to behave like RaceSimulation(so now typescript will keep the checks of properties for us),
+            and I used the type check for the variable that is keeping the reference of the object, so again typescript will
+            make sure that variable can only contain reference of specified type and keep properties of assigned object in it's check
          */
     }
 
 
-    startRaceById(raceId: string, callback: Function) {
+    startRaceById(race_id: number, callback: Function) {
 
-        const currentRaceSimulation: RaceSimulation= this.raceTracker[raceId];
+        const currentRaceSimulation: RaceSimulation = this.raceTracker[race_id];
         if (!currentRaceSimulation || currentRaceSimulation.setIntervalPointer) {
             throw new Error("Invalid requested for race, either race has already been started or race doesn't exists");
         }
@@ -94,6 +93,11 @@ export default class RaceManager {
 
         currentRaceSimulation.raceInfo.Results.status = ProgressStatus.IN_PROGRESS;
         currentRaceSimulation.setIntervalPointer = setInterval(() => {
+            const currentTime = new Date();
+            let playerPositions : Position [] = currentRaceSimulation.raceInfo.Results.positions;
+            // playerPositions = playerPositions.map((element) => {
+
+            // });
             // currentRaceSimulation.
 
         }, 1000);
@@ -107,10 +111,10 @@ export default class RaceManager {
 
     }
 
-    getRaceInfoById(raceId: string): Nullable<CurrentRaceStatus> {
-        const raceSimulation: RaceSimulation = this.raceTracker[raceId];
+    getRaceInfoById(race_id: number): Nullable<CurrentRaceStatus> {
+        const raceSimulation: RaceSimulation = this.raceTracker[race_id];
         if (!raceSimulation) {
-            throw new Error(`No such race of ${raceId} exists`);
+            throw new Error(`No such race of ${race_id} exists`);
         }
 
         return raceSimulation.raceInfo.Results;

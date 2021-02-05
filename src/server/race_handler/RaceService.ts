@@ -23,8 +23,12 @@ export default class RaceService {
         callback(null, this.raceManager.getCars());
     }
 
-    getRaceInfoById(raceId: string): Nullable<CurrentRaceStatus> {
-        return null;
+    getRaceInfoById(race_id: number): Nullable<CurrentRaceStatus> | ErrorResponse {
+        try {
+            return this.raceManager.getRaceInfoById(race_id);
+        } catch (ex) {
+            return this.composeError("some error while getting the info of the race", ex);
+        }
     }
 
 
@@ -35,20 +39,25 @@ export default class RaceService {
             return this.raceManager.createNewRace(player_id, track_id);
 
         } catch (ex) {
-            return {
-                error: "some error occured while creating a race",
-                reason: ex.message
-            }
+            return this.composeError("some error occured while creating the race", ex);
         }
     }
 
-    startRaceById(raceId: string, callback: Function) {
+
+    startRaceById(race_id: string, callback: Function) {
 
     }
 
 
-    accelerateCar(raceId: string, callback: Function) {
+    accelerateCar(race_id: string, callback: Function) {
 
+    }
+
+    composeError(errorMessage: string, ex: Error): ErrorResponse {
+        return {
+            error: errorMessage,
+            reason: ex.message
+        }
     }
 
 }
