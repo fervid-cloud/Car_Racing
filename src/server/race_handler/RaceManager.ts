@@ -168,11 +168,13 @@ export default class RaceManager {
                 const playerActivityInfo: HumanPlayerActivityInfo = currentRaceSimulation.humanPlayers[id];
                 if (playerActivityInfo) {
                     const currentTime: number = Date.now();
-                    // if current time and last time accelerated diff is greater than specified timer i.e 1 second here
                     let timeStampts = playerActivityInfo.accelerationAttempts;
+                    speedIncreaseTimes = 0;
                     const n = timeStampts.length;
-                    let k = Math.min(timeStampts.length, 3);
+                    const maxTimes = Math.floor(Math.random() * (2)) + 1;
+                    let k = Math.min(timeStampts.length, maxTimes);
                     for (let i = n - 1; k > 0; --i) {
+                         // if current time and last time accelerated diff is greater than specified timer i.e 1 second here
                         if (currentTime - timeStampts[i] > this.TIMER_INTERVAL) {
                             break;
                         }
@@ -180,17 +182,20 @@ export default class RaceManager {
                         --k;
                     }
                     timeStampts.slice(0, n);
-                    speedIncreaseTimes -= 2; // equivalent of setting this variable first as 0 at start in this block of scope then doing -1, here
+                    if (speedIncreaseTimes == 0) {
+                        speedIncreaseTimes = 1;
+                        acceleration = -acceleration;
+                    }
                 }
 
                 let newSpeed = Math.min(topSpeed, Math.max(0, oldSpeed + ((speedIncreaseTimes * acceleration) * this.millSecondtoSeconds(this.TIMER_INTERVAL))));
 
                 let distanceTravelledForInterval;
                 if (oldSpeed == topSpeed) {
-                    distanceTravelledForInterval = (speedIncreaseTimes <= 0) ? 0 : oldSpeed * this.millSecondtoSeconds(this.TIMER_INTERVAL);
+                    distanceTravelledForInterval = oldSpeed * this.millSecondtoSeconds(this.TIMER_INTERVAL);
                 }
                 else {
-                    distanceTravelledForInterval = Math.abs((Math.pow(newSpeed, 2) - Math.pow(oldSpeed, 2)) / (2 * acceleration));
+                    distanceTravelledForInterval = (Math.pow(newSpeed, 2) - Math.pow(oldSpeed, 2)) / (2 * acceleration);
                 }
 
                 console.log("time in seconds is : ", this.millSecondtoSeconds(this.TIMER_INTERVAL));
