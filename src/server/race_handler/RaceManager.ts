@@ -10,6 +10,7 @@ import { RaceSimulation } from "model/RaceSimulation";
 import { Nullable, SetIntervalType } from "custom-type-definition";
 import CarPositionInfo from "model/CarPositionInfo";
 import { HumanPlayerActivityInfo } from "model/RaceSimulation";
+import * as util from 'util';
 
 @Service()
 export default class RaceManager {
@@ -28,7 +29,7 @@ export default class RaceManager {
 
     private TIMER_INTERVAL: number;
 
-    private GARBAGE_COLLECTION_TIME_INTERVAL = 10 * 60 * 1000; // 10 minutes in milliseconds
+    private GARBAGE_COLLECTION_TIME_INTERVAL = 1/2 * 60 * 1000; // 10 minutes in milliseconds
 
     constructor() {
         this.data = jsonData;
@@ -59,9 +60,10 @@ export default class RaceManager {
         console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         console.log("---------------------------------------GARBAGE COLLECTION EVENT---------------------------------");
         console.log("current status of the raceTracker is : ", this.raceTracker);
-        console.log(this.raceTracker);
+        console.log(util.inspect(this.raceTracker, { depth: null }));
         const existingRaceIds: string[] = Object.keys(this.raceTracker);
-        const currentTime = Date.now();
+        const currentTime = new Date();
+        console.log("-----------current Time is : ", currentTime);
         existingRaceIds.forEach((currentRaceId) => {
             const currentRaceInfo: RaceSimulation = this.raceTracker[currentRaceId];
             if (!currentRaceId) {
@@ -73,20 +75,23 @@ export default class RaceManager {
                 return;
             }
             Object.keys(humanPlayerTracker).forEach(playerId => {
-                latestTime = Math.max(latestTime, humanPlayerTracker[playerId].lastActivity);
+                latestTime = Math.max(latestTime, humanPlayerTracker[playerId].lastActivity.getTime());
             });
+            //getTime method returns time in millisecond passed since 1970 which is same as returned by Date.now()
 
-            if (currentTime - latestTime >= this.GARBAGE_COLLECTION_TIME_INTERVAL) {
-                console.log("before garbage collection:");
-                console.log(this.raceTracker);
+            if (currentTime.getTime() - latestTime > this.GARBAGE_COLLECTION_TIME_INTERVAL) {
+                console.log("before garbage collection, raceTracker status is :");
+                console.log(util.inspect(this.raceTracker, { depth: null }));
                 clearInterval(<SetIntervalType>currentRaceInfo.setIntervalPointer);
                 delete this.raceTracker[currentRaceId];
                 console.log("interval is removed");
                 console.log("race with RaceId: ", currentRaceId, "has been garbage collected");
-                console.log("after garbage collection, update status is :");
-                console.log(this.raceTracker);
+                console.log("after garbage collection, update raceTracker status is :");
+                console.log(util.inspect(this.raceTracker, { depth: null }));
+                console.log("-----------current Time is : ", currentTime);
             }
         });
+        console.log("---------------------------------------END OF GARBAGE COLLECTION EVENT---------------------------------");
         console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     }
 
@@ -156,13 +161,13 @@ export default class RaceManager {
         // carefully mind the  difference of '.' and bracket notation, '.' notation search for string equivalent of variable name whereas
         // bracket notation replace the variable with it's value unless the variable is a string itself
         const hostPlayerActivity : HumanPlayerActivityInfo= {
-            lastActivity: Date.now(),
+            lastActivity: new Date(),
             accelerationAttempts: []
         }
 
         newRaceSimulation.humanPlayers[playerId] = hostPlayerActivity;
         this.raceTracker[randomRaceId] = newRaceSimulation;
-        console.log("new raceTracker is : ", this.raceTracker);
+        console.log("new raceTracker is : ", util.inspect(this.raceTracker, { depth: null }));
         return newRaceInfo;
         /**
             both typecasting and lefthandside type declaration are not same ,it's not just matter of preference, you can
@@ -183,17 +188,22 @@ export default class RaceManager {
             throw new Error("Invalid requested for race, either race has already been started or race doesn't exists");
         }
         let counter = 0;
-        this.printStatus(counter, currentRaceSimulation);
         currentRaceSimulation.raceInfo.Results.status = ProgressStatus.IN_PROGRESS;
         currentRaceSimulation.setIntervalPointer = setInterval(() => {
             let playerPositions: CarPositionInfo[] = currentRaceSimulation.raceInfo.Results.positions;
             this.shuffleArray(playerPositions);
             playerPositions = playerPositions.map(this.updateRaceProgressStatus(currentRaceSimulation));
             ++counter;
-            this.printStatus(counter, currentRaceSimulation, playerPositions);
+
             console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
             console.log("current status of the race tracker is : ");
-            console.log(this.raceTracker);
+            /**
+               Basically console.log will not go through long and complex object, and may decide to just print [Object] instead.
+               JSON.stringify trick can be used to get the whole structure of the object, but that would not look pleasant to the eyes
+               A good way to prevent that in node.js is to use core module in nodejs 'util' so below is example of using 'util.inspect'
+             */
+            console.log(util.inspect(this.raceTracker, { depth: null }));
+            // console.log(JSON.stringify(this.raceTracker));
         }, this.TIMER_INTERVAL);
 
         return true;
@@ -205,14 +215,13 @@ export default class RaceManager {
         return (carPositionInfo: CarPositionInfo) => {
             let { speed, distanceTravelled, acceleration, topSpeed, id } = carPositionInfo;
             const currentTrackLength: number = currentRaceSimulation.raceInfo.Track.length;
-            console.log("current player is : ", carPositionInfo);
             if (distanceTravelled < currentTrackLength) {
 
                 const oldSpeed: number = speed;
                 let speedIncreaseTimes = 1;
                 const playerActivityInfo: HumanPlayerActivityInfo = currentRaceSimulation.humanPlayers[id];
                 if (playerActivityInfo) {
-                    const currentTime: number = Date.now();
+                    const currentTime: number = new Date().getTime();
                     let timeStampts = playerActivityInfo.accelerationAttempts;
                     speedIncreaseTimes = 0;
                     const n = timeStampts.length;
@@ -220,13 +229,13 @@ export default class RaceManager {
                     let k = Math.min(timeStampts.length, maxTimes);
                     for (let i = n - 1; k > 0; --i) {
                          // if current time and last time accelerated diff is greater than specified timer i.e 1 second here
-                        if (currentTime - timeStampts[i] > this.TIMER_INTERVAL) {
+                        if (currentTime - timeStampts[i].getTime() > this.TIMER_INTERVAL) {
                             break;
                         }
                         ++speedIncreaseTimes;
                         --k;
                     }
-                    timeStampts.slice(0, n);
+                    timeStampts.splice(0, n);
                     if (speedIncreaseTimes == 0) {
                         speedIncreaseTimes = 1;
                         acceleration = -acceleration;
@@ -274,17 +283,6 @@ export default class RaceManager {
     }
 
 
-    printStatus(counter: number, ...all : any) {
-        console.log("-------------------------------------------------------------------------------------");
-        console.log("at stage : ", counter, " value is :");
-        for (let i = 0; i < all.length; ++i) {
-            console.log(all[i]);
-        }
-        console.log("-------------------------------------------------------------------------------------");
-    }
-
-
-
     accelerateCar(raceId: number, playerId: number) {
         const currentRaceSimulation: RaceSimulation = this.raceTracker[raceId];
 
@@ -302,15 +300,13 @@ export default class RaceManager {
         }
 
         const playerActivityInfo: HumanPlayerActivityInfo = currentRaceSimulation.humanPlayers[playerId];
-        const currentTime = Date.now();
+        const currentTime = new Date();
         playerActivityInfo.accelerationAttempts.push(currentTime);
         playerActivityInfo.lastActivity = currentTime;
         return true;
     }
 
 
-    /**
-     */
     getRaceInfoById(raceId: number): Nullable<CurrentRaceStatus> {
         console.log("returning the race info---------------------");
         const raceSimulation: RaceSimulation = this.raceTracker[raceId];

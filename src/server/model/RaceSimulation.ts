@@ -2,8 +2,8 @@ import { Nullable, SetIntervalType } from "custom-type-definition";
 import RaceInfo from "./RaceInfo";
 
 export interface HumanPlayerActivityInfo {
-    lastActivity: number;
-    accelerationAttempts : number []
+    lastActivity: Date;
+    accelerationAttempts : Date []
 }
 
 export interface RaceSimulation {
