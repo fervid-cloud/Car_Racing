@@ -2,8 +2,6 @@ import * as express from 'express';
 import RaceService from './RaceService';
 import { Request, Response, NextFunction} from 'express';
 import Container from 'typedi';
-import { CurrentRaceStatus } from 'dto/CurrentRaceStatus';
-import { Nullable } from '../custom-type-definition';
 
 const raceController = express.Router();
 
@@ -142,10 +140,10 @@ raceController.post("/races/:id/accelerate", (req, res) => {
 });
 
 
-function isArrayOfStrings(value: any): boolean {
+/* function isArrayOfStrings(value: any): boolean {
     return Array.isArray(value) && value.every(item => typeof item === "string");
 }
-
+ */
 
 
 
