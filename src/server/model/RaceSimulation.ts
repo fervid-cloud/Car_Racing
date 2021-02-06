@@ -9,7 +9,7 @@ export interface HumanPlayerActivityInfo {
 export interface RaceSimulation {
     setIntervalPointer: Nullable<SetIntervalType>;
     humanPlayers: {
-        [playerId: number]: HumanPlayerActivityInfo
+        [playerId: string]: HumanPlayerActivityInfo
     };
     completedRaceCount: number;
     raceInfo: RaceInfo;
