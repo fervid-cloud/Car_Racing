@@ -28,7 +28,6 @@ export default class RaceManager {
 
     private TIMER_INTERVAL: number;
 
-    // private frictionDeAcceleration: number;
     constructor() {
         this.data = jsonData;
         this.cars = this.data['cars'];
@@ -38,7 +37,6 @@ export default class RaceManager {
         this.MaxRaceId = (1 << 30);
         this.MinRaceId = 1;
         this.TIMER_INTERVAL = 1000;
-        // this.frictionDeAcceleration = 0; //m/s
     }
 
 
@@ -147,7 +145,6 @@ export default class RaceManager {
             playerPositions = playerPositions.map(this.updateRaceProgressStatus(currentRaceSimulation));
             ++counter;
             this.printStatus(counter, currentRaceSimulation, playerPositions);
-            // console.log(playerPositions);
         }, this.TIMER_INTERVAL);
 
         return true;
@@ -205,7 +202,6 @@ export default class RaceManager {
                 if (totalDistanceTravelled >= currentTrackLength) {
                     newSpeed = 0;
                     totalDistanceTravelled = currentTrackLength;
-                    // carPositionInfo.finalPosition = Date.now();
                     if (!carPositionInfo.finalPosition) {
                         carPositionInfo.finalPosition = ++currentRaceSimulation.completedRaceCount;
                     }
@@ -218,8 +214,6 @@ export default class RaceManager {
 
                 carPositionInfo.distanceTravelled = totalDistanceTravelled;
                 carPositionInfo.speed = newSpeed;
-                console.log("old speed is : ", oldSpeed);
-                console.log("new speed is : ", newSpeed);
             }
 
             return carPositionInfo;
@@ -260,8 +254,6 @@ export default class RaceManager {
             throw new Error("Race is not in progress, acceleration is not possible");
         }
 
-        // const callback: Function = this.updateRaceProgressStatus(currentRaceSimulation, true);
-        // setTimeout(() => callback(playerCarPositionInfo[0]), 0);
         const playerActivityInfo: HumanPlayerActivityInfo = currentRaceSimulation.humanPlayers[playerId];
         const currentTime = Date.now();
         playerActivityInfo.accelerationAttempts.push(currentTime);
@@ -270,7 +262,8 @@ export default class RaceManager {
     }
 
 
-
+    /**
+     */
     getRaceInfoById(raceId: number): Nullable<CurrentRaceStatus> {
         console.log("returning the race info---------------------");
         const raceSimulation: RaceSimulation = this.raceTracker[raceId];
