@@ -158,7 +158,7 @@ async function handleCreateRace() {
 
         const race = await createRace(racerId, trackId);
 
-        store['raceId'] = parseInt(race['ID']);
+        store['raceId'] = parseInt(race['raceId']);
 
         store['raceTrackLength'] = race['Track'].length;
 
@@ -269,7 +269,7 @@ function handleSelection(target, type) {
 
         target.appendChild(stringToFragment(html));
 
-        const updateProperty = `${type.toLowerCase()}_id`;
+        const updateProperty = `${type.toLowerCase()}Id`;
         store[updateProperty] = parseInt(target['id']);
     } catch(ex) {
         alert("Some error occured while selecting the choice, please try after some time");
@@ -575,7 +575,7 @@ function getView(positions) {
  * @returns {string}
  */
 function raceInProgress(positions) {
-    // positions = positions.sort((a, b) => (a.distanceTravelled > b.distanceTravelled) ? -1 : 1);
+    positions = positions.sort((a, b) => (a.id < b.id) ? -1 : 1);
 
     const graphicalUI = `
                 <h1>Race Progress</h1>
@@ -736,7 +736,6 @@ function createRace(playerId, trackId) {
     return fetch(`${SERVER}/api/races`, {
         method: 'POST',
         ...defaultFetchOpts(),
-        dataType: 'jsonp',
         body: JSON.stringify(body)
     }).then((res) => {
             return res.json();

@@ -13,7 +13,6 @@
     "express-oas-generator": "^1.0.30",
     "node-fetch": "^2.6.0",
     "reflect-metadata": "^0.1.13",
-    "swagger-autogen": "^2.5.10",
     "typedi": "^0.10.0"
   },
   "devDependencies": {
