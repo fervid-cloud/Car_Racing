@@ -1,7 +1,5 @@
 form ul {
     display: flex;
-
-    
     flex-wrap: wrap;
 }
 
@@ -109,4 +107,9 @@ form li h3 {
 
 .card.racer p {
     font-size: 20px;
+}
+
+.driverInfo:hover {
+    cursor: default;
+    pointer-events: none;
 }

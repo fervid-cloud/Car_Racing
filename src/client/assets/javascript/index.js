@@ -158,7 +158,7 @@ async function handleCreateRace() {
 
         const race = await createRace(racerId, trackId);
 
-        store['raceId'] = parseInt(race['ID']);
+        store['raceId'] = parseInt(race['raceId']);
 
         store['raceTrackLength'] = race['Track'].length;
 
@@ -269,7 +269,7 @@ function handleSelection(target, type) {
 
         target.appendChild(stringToFragment(html));
 
-        const updateProperty = `${type.toLowerCase()}_id`;
+        const updateProperty = `${type.toLowerCase()}Id`;
         store[updateProperty] = parseInt(target['id']);
     } catch(ex) {
         alert("Some error occured while selecting the choice, please try after some time");
@@ -519,11 +519,28 @@ function showFields(objectFields, position) {
  */
 function getCarInfo(objectInfo) {
 
-   return `<ul>  <li style="display: inline-block; overflow-x: auto;">${objectInfo['driverName']}</li>
-        <li>${objectInfo['speed']} km/h</li>
+    return `<ul class=driverInfo>
+        <li style="display: inline-block;" title="checking">${getFormattedName(objectInfo['driverName'])}</li>
+        <li>${Math.floor(objectInfo['speed'])} km/h</li>
         </ul>
         `;
 
+}
+
+
+function getFormattedName(driverName) {
+    console.log("driver name is : ", driverName);
+    const nameLength = driverName.length;
+    let updatedName = driverName;
+    if (nameLength > 15) {
+        const firstPart = driverName.substring(0, 5);
+        const secondPart = driverName.substring(nameLength - 7, nameLength);
+        console.log("first part ", firstPart);
+        console.log("second part: ", secondPart);
+        updatedName =  firstPart+ "..." + secondPart;
+    }
+    console.log("updated name is : ", updatedName);
+    return updatedName;
 }
 
 
@@ -537,10 +554,9 @@ function getView(positions) {
         const currentProgress = getProgressReport(element);
         let carInfoView = "carInfoView"
         if(element['id'] === store["racerId"]) {
-            element['driverName'] += "     (You)";
+            element['driverName'] = "(You) " + element['driverName'];
             store['racerCompletionProgress'] = currentProgress;
             carInfoView += ` myCar`;
-
         }
         return ` <div class="trackView">
 
@@ -575,7 +591,7 @@ function getView(positions) {
  * @returns {string}
  */
 function raceInProgress(positions) {
-    // positions = positions.sort((a, b) => (a.distanceTravelled > b.distanceTravelled) ? -1 : 1);
+    positions = positions.sort((a, b) => (a.id < b.id) ? -1 : 1);
 
     const graphicalUI = `
                 <h1>Race Progress</h1>
@@ -736,7 +752,6 @@ function createRace(playerId, trackId) {
     return fetch(`${SERVER}/api/races`, {
         method: 'POST',
         ...defaultFetchOpts(),
-        dataType: 'jsonp',
         body: JSON.stringify(body)
     }).then((res) => {
             return res.json();

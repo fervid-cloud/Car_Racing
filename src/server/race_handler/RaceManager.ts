@@ -38,7 +38,7 @@ export default class RaceManager {
         this.MaxRaceId = (1 << 30);
         this.MinRaceId = 1;
         this.TIMER_INTERVAL = 1000;
-        this.frictionDeAcceleration = 2; //m/s
+        this.frictionDeAcceleration = 5; //m/s
     }
 
 
@@ -157,11 +157,26 @@ export default class RaceManager {
             console.log("current player is : ", carPositionInfo);
             if (distanceTravelled < currentTrackLength) {
                 console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", currentRaceSimulation.humanPlayers[id]);
-                if (currentRaceSimulation.humanPlayers[id] && !speedIncrease) {
-                    acceleration = 0;
+
+                //adding randomness in the accelaration to increase the toughness of the game for the human player
+                let currentDeAcceleration = this.frictionDeAcceleration;
+
+                if (speedIncrease) {
+                    // acceleration = Math.floor(Math.random() * (acceleration)) + 1;
+                    acceleration = Math.floor(Math.random() * (acceleration)) + 1;  // from 0 to 5, i.e 6 number range 0-5 where 0 & 5 are inclusive
+                    currentDeAcceleration = this.getRandomRealNumberRange(0, currentDeAcceleration);
+                } else {
+                    if (currentRaceSimulation.humanPlayers[id]) {
+                        acceleration = 0;
+                    } else {
+                        if (currentDeAcceleration > acceleration) {
+                            currentDeAcceleration = this.getRandomRealNumberRange(0, acceleration / 2);
+                        }
+                    }
                 }
 
-                const netAcceleration: number = acceleration - this.frictionDeAcceleration;
+
+                const netAcceleration: number = acceleration - currentDeAcceleration;
                 const oldSpeed: number = speed;
 
                 let distanceTravelledForInterval;
@@ -201,6 +216,12 @@ export default class RaceManager {
 
             return carPositionInfo;
         }
+    }
+
+
+
+    getRandomRealNumberRange(min: number, max: number): number {
+        return Math.random() * (max - min + 1) + min;
     }
 
 
