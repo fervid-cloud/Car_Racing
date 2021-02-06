@@ -67,7 +67,8 @@ raceController.get("/cars", (req: Request, res: Response) : void => {
    - results: Cars[] (array of cars in the position they finished, available if the race is finished)
  */
 raceController.post("/races", (req, res) => {
-
+    console.log("request came for creating the race----------------------------------");
+    console.log(req.body);
     const raceCreationResult = raceService.createRace(req.body);
     res.send(raceCreationResult);
 
@@ -82,10 +83,10 @@ raceController.post("/races", (req, res) => {
 - Returns nothing
  */
 raceController.post("/races/:id/start", (req, res) => {
-
+    console.log("request came for starrting the race----------------------------------");
     raceService.startRaceById(parseInt(req.params.id), (err: Error, raceStartStatus: any) => {
         if (err) {
-            res.send({ error: "some error occured while starting the race" });
+            res.send(err);
             return;
         }
         res.send(raceStartStatus);
@@ -101,6 +102,7 @@ raceController.post("/races/:id/start", (req, res) => {
 
  */
 raceController.get("/races/:id", (req: Request, res: Response) => {
+    console.log("request came for getting the status the race-------------------------------------------------------");
     const raceStatus = raceService.getRaceInfoById(parseInt(req.params.id));
     res.send(raceStatus);
 

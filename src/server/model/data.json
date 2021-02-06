@@ -2,36 +2,36 @@
     "cars": [
         {
             "id": 1,
-            "driver_name": "Racer 1",
-            "top_speed": 650,
+            "driverName": "Racer 1",
+            "topSpeed": 650,
             "acceleration": 8,
             "handling": 7
         },
         {
             "id": 2,
-            "driver_name": "Racer 2",
-            "top_speed": 600,
+            "driverName": "Racer 2",
+            "topSpeed": 600,
             "acceleration": 9,
             "handling": 9
         },
         {
             "id": 3,
-            "driver_name": "Racer 3",
-            "top_speed": 500,
+            "driverName": "Racer 3",
+            "topSpeed": 500,
             "acceleration": 10,
             "handling": 6
         },
         {
             "id": 4,
-            "driver_name": "Racer 4",
-            "top_speed": 550,
+            "driverName": "Racer 4",
+            "topSpeed": 550,
             "acceleration": 7,
             "handling": 8
         },
         {
             "id": 5,
-            "driver_name": "Racer 5",
-            "top_speed": 700,
+            "driverName": "Racer 5",
+            "topSpeed": 700,
             "acceleration": 5,
             "handling": 4
         }

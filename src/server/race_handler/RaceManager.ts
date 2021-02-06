@@ -33,11 +33,29 @@ export default class RaceManager {
         this.data = jsonData;
         this.cars = this.data['cars'];
         console.log(this.cars);
-        this.tracks = this.data['tracks'];
+        console.log(this.data['tracks']);
+        this.tracks = this.assignTracks(this.data['tracks']);
         this.MaxRaceId = (1 << 30);
         this.MinRaceId = 1;
         this.TIMER_INTERVAL = 1000;
-        this.frictionDeAcceleration = -5; //km/s
+        this.frictionDeAcceleration = 5; //m/s
+    }
+
+
+    assignTracks(givenTracks: { segments: number[]; name: string; id: number; }[]): Track[] {
+        console.log("_______________________");
+        console.log(givenTracks);
+        return givenTracks.map((element: { segments: number[]; name: string; id: number; }) => {
+            console.log("segments is :", element.segments);
+            const singleTrack: Track = {
+                name: element.name,
+                id: element.id,
+                length: element.segments.reduce((previousValue: number = 0, segmentValue: number) => {
+                    return previousValue + segmentValue;
+                })
+            }
+            return singleTrack;
+        });
     }
 
     getCars(): any {
@@ -57,14 +75,14 @@ export default class RaceManager {
      */
     createNewRace(playerId: number, trackId: number): any{
         let randomRaceId = Math.floor(Math.random() * (this.MaxRaceId - this.MinRaceId + 1)) + this.MinRaceId;
-
+        console.log("random raceId generated is : ", randomRaceId);
         const currentRaceStatus: CurrentRaceStatus = {
             status: ProgressStatus.UNSTARTED,
             positions: this.cars.map((car) => {
                 return <CarPositionInfo> {
                     ...car,
                     speed: 0,
-                    distanceTravelled: 0,
+                    distanceTravelled: 0
                 };
 
             })
@@ -77,35 +95,46 @@ export default class RaceManager {
             Cars: this.cars,
             Results: currentRaceStatus
         }
-
-        let sumTillNow = 0;
-        this.raceTracker[randomRaceId] = <RaceSimulation>{
+;
+        const newRaceSimulation: RaceSimulation = {
             setIntervalPointer: undefined,
             raceInfo: newRaceInfo,
-            completedRaceCount: 0
+            completedRaceCount: 0,
+            humanPlayers: {
+
+            }
         };
+
 
         // carefully mind the  difference of '.' and bracket notation, '.' notation search for string equivalent of variable name whereas
         // bracket notation replace the variable with it's value unless the variable is a string itself
-        this.raceTracker[randomRaceId].humanPlayers[playerId] = -1;
+        newRaceSimulation.humanPlayers[playerId] = -1;
+        console.log("playerId is : ", playerId);
+        console.log("new raceSimulation generated is : ", newRaceSimulation);
+
+        this.raceTracker[randomRaceId] = newRaceSimulation
         return newRaceInfo;
         /**
-            both typecasting and lefthandside type declaration is valid,it's just matter of preference, you can
-            use <RaceSimulation> at the right hand side of assignmentor while returning the object which is typecasting the
-            object to force it to behave like RaceSimulation(so now typescript will keep the checks of properties for us),
-            and I used the type check for the variable that is keeping the reference of the object, so again typescript will
+            both typecasting and lefthandside type declaration are not same ,it's not just matter of preference, you can
+            use <RaceSimulation> as a hack at the right hand side of assignment operator(if you do not have some property in the object at the right hand side that is
+            defined by typescript through interface or class) while returning the object which is typecasting the
+            object to force it to behave like RaceSimulation(so now typescript will only keep the checks of properties for us which were typecasted, not those which exist in
+            the definition of object but doesn't exit in the typecasted object, but it doesn't mean that it will not give error if there is some property
+            which doesn't exit in interface/class but exist in object being typecasted), and I used the type check for the variable that is keeping the reference of the object, so again typescript will
             make sure that variable can only contain reference of specified type and keep properties of assigned object in it's check
          */
     }
 
 
-    startRaceById(race_id: number) : boolean{
+    startRaceById(raceId: number) : boolean{
 
-        const currentRaceSimulation: RaceSimulation = this.raceTracker[race_id];
+        const currentRaceSimulation: RaceSimulation = this.raceTracker[raceId];
         if (!currentRaceSimulation || currentRaceSimulation.setIntervalPointer) {
             throw new Error("Invalid requested for race, either race has already been started or race doesn't exists");
         }
-
+        let counter = 0;
+        this.printStatus(counter, currentRaceSimulation);
+        console.log("before starting the race : ", currentRaceSimulation.raceInfo.Results.positions);
         currentRaceSimulation.raceInfo.Results.status = ProgressStatus.IN_PROGRESS;
         currentRaceSimulation.setIntervalPointer = setInterval(() => {
             let playerPositions: CarPositionInfo[] = currentRaceSimulation.raceInfo.Results.positions;
@@ -113,22 +142,36 @@ export default class RaceManager {
             playerPositions = playerPositions.map((carPositionInfo: CarPositionInfo) => {
                 let { speed, distanceTravelled, acceleration, topSpeed, id } = carPositionInfo;
                 const currentTrackLength: number = currentRaceSimulation.raceInfo.Track.length;
-
+                console.log("current player is : ", carPositionInfo);
                 if (distanceTravelled < currentTrackLength) {
+                    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", currentRaceSimulation.humanPlayers[id]);
                     if (currentRaceSimulation.humanPlayers[id]) {
                         acceleration = 0;
                     }
 
                     const netAcceleration : number = acceleration - this.frictionDeAcceleration;
                     const oldSpeed: number = speed;
-                    const newSpeed: number = Math.min(topSpeed, Math.max(0, oldSpeed + netAcceleration * this.TIMER_INTERVAL / 1000));
-                    const distanceTravelledForInterval: number = Math.max(0, oldSpeed + ((1 / 2) * netAcceleration * this.TIMER_INTERVAL / 100));
+
+                    let distanceTravelledForInterval;
+                    if (oldSpeed == topSpeed) {
+                        distanceTravelledForInterval = (netAcceleration <= 0) ? 0 : oldSpeed * this.millSecondtoSeconds(this.TIMER_INTERVAL);
+                    }
+                    else {
+                        distanceTravelledForInterval = Math.max(0, oldSpeed + ((1 / 2) * netAcceleration * this.millSecondtoSeconds(this.TIMER_INTERVAL)));
+                    }
+
+                    console.log("netAcceleration is : ", netAcceleration);
+                    console.log("time in seconds is : ", this.millSecondtoSeconds(this.TIMER_INTERVAL));
+                    console.log("top speed is : ", topSpeed);
+                    let newSpeed = Math.min(topSpeed, Math.max(0, oldSpeed + (netAcceleration * this.millSecondtoSeconds(this.TIMER_INTERVAL))));
+
                     let totalDistanceTravelled: number = distanceTravelled + distanceTravelledForInterval;
 
                     if (totalDistanceTravelled >= currentTrackLength) {
+                        newSpeed = 0;
                         totalDistanceTravelled = currentTrackLength;
-                        carPositionInfo.finalPosition = Date.now();
-                        ++currentRaceSimulation.completedRaceCount;
+                        // carPositionInfo.finalPosition = Date.now();
+                        carPositionInfo.finalPosition = ++currentRaceSimulation.completedRaceCount;
 
                         if (currentRaceSimulation.completedRaceCount == currentRaceSimulation.raceInfo.Cars.length) {
                             clearInterval(<SetIntervalType>currentRaceSimulation.setIntervalPointer);
@@ -138,14 +181,28 @@ export default class RaceManager {
 
                     carPositionInfo.distanceTravelled = totalDistanceTravelled;
                     carPositionInfo.speed = newSpeed;
+                    console.log("old speed is : ", oldSpeed);
+                    console.log("new speed is : ", newSpeed);
                 }
 
                 return carPositionInfo;
             });
-
+            ++counter;
+            this.printStatus(counter, currentRaceSimulation, playerPositions);
+            // console.log(playerPositions);
         }, this.TIMER_INTERVAL);
 
         return true;
+    }
+
+
+    printStatus(counter: number, ...all : any) {
+        console.log("-------------------------------------------------------------------------------------");
+        console.log("at stage : ", counter, " value is :");
+        for (let i = 0; i < all.length; ++i) {
+            console.log(all[i]);
+        }
+        console.log("-------------------------------------------------------------------------------------");
     }
 
 
@@ -155,10 +212,11 @@ export default class RaceManager {
 
 
 
-    getRaceInfoById(race_id: number): Nullable<CurrentRaceStatus> {
-        const raceSimulation: RaceSimulation = this.raceTracker[race_id];
+    getRaceInfoById(raceId: number): Nullable<CurrentRaceStatus> {
+        console.log("returning the race info---------------------");
+        const raceSimulation: RaceSimulation = this.raceTracker[raceId];
         if (!raceSimulation) {
-            throw new Error(`No such race of ${race_id} exists`);
+            throw new Error(`No such race of ${raceId} exists`);
         }
         return raceSimulation.raceInfo.Results;
     }
@@ -179,5 +237,9 @@ export default class RaceManager {
         }
     }
 
+
+    millSecondtoSeconds(milliSecondTime: number) {
+        return milliSecondTime / 1000;
+    }
 
 }

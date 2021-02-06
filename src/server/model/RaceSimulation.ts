@@ -4,7 +4,7 @@ import RaceInfo from "./RaceInfo";
 export default interface RaceSimulation {
     setIntervalPointer: Nullable<SetIntervalType>;
     humanPlayers: {
-        [player_id: string] : number
+        [playerId: number] : number
     };
     completedRaceCount: number;
     raceInfo: RaceInfo;
