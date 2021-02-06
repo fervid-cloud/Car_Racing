@@ -33,6 +33,7 @@ export default class RaceManager {
 
     constructor() {
         this.data = jsonData;
+        console.log("The Cars are -------------------");
         this.cars = this.data['cars'];
         console.log(this.cars);
         console.log(this.data['tracks']);
@@ -97,7 +98,7 @@ export default class RaceManager {
 
 
     assignTracks(givenTracks: { segments: number[]; name: string; id: number; }[]): Track[] {
-        console.log("_______________________");
+        console.log("The Tracks are -------------------");
         console.log(givenTracks);
         return givenTracks.map((element: { segments: number[]; name: string; id: number; }) => {
             const singleTrack: Track = {
@@ -192,7 +193,7 @@ export default class RaceManager {
         currentRaceSimulation.setIntervalPointer = setInterval(() => {
             let playerPositions: CarPositionInfo[] = currentRaceSimulation.raceInfo.Results.positions;
             this.shuffleArray(playerPositions);
-            playerPositions = playerPositions.map(this.updateRaceProgressStatus(currentRaceSimulation));
+            playerPositions.forEach(this.updateRaceProgressStatus(currentRaceSimulation));
             ++counter;
 
             console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
