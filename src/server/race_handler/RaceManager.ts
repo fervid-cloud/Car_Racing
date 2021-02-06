@@ -6,9 +6,11 @@ import { Service } from "typedi";
 import jsonData from '../model/data.json';
 import RaceInfo from "model/RaceInfo";
 import Position from "model/CarPositionInfo";
-import RaceSimulation from "model/RaceSimulation";
+import { RaceSimulation } from "model/RaceSimulation";
 import { Nullable, SetIntervalType } from "custom-type-definition";
 import CarPositionInfo from "model/CarPositionInfo";
+import { HumanPlayerActivityInfo } from "model/RaceSimulation";
+import * as util from 'util';
 
 @Service()
 export default class RaceManager {
@@ -23,14 +25,15 @@ export default class RaceManager {
 
     private MinRaceId: number;
 
-    private raceTracker : { [raceId: number ] : RaceSimulation } = {};
+    private raceTracker : { [raceId: string ] : RaceSimulation } ;
 
     private TIMER_INTERVAL: number;
 
-    private frictionDeAcceleration: number;
+    private GARBAGE_COLLECTION_TIME_INTERVAL = 1/2 * 60 * 1000; // 10 minutes in milliseconds
 
     constructor() {
         this.data = jsonData;
+        console.log("The Cars are -------------------");
         this.cars = this.data['cars'];
         console.log(this.cars);
         console.log(this.data['tracks']);
@@ -38,15 +41,66 @@ export default class RaceManager {
         this.MaxRaceId = (1 << 30);
         this.MinRaceId = 1;
         this.TIMER_INTERVAL = 1000;
-        this.frictionDeAcceleration = 5; //m/s
+        this.raceTracker = {};
+        this.initializeGarbageCollector();
+    }
+
+
+    private initializeGarbageCollector(): void {
+        /**Note that, the arrow function “inherits” the context from the function where it is defined.
+        A regular function in this example would create its own context (window or undefined in strict mode).
+        So to make the same code work correctly with a function expression it’s necessary to manually bind the
+        context: setTimeout(function() {...}.bind(this)). This is verbose, and using an arrow function is a
+        cleaner and shorter solution. An arrow function is bound with the lexical this once and forever. this
+        cannot be modified even when using the context modification methods(i.e using, call, bind or apply will not work):  */
+        setInterval(this.evictGarbage.bind(this), this.GARBAGE_COLLECTION_TIME_INTERVAL);
+    }
+
+
+    evictGarbage(): void {
+        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        console.log("---------------------------------------GARBAGE COLLECTION EVENT---------------------------------");
+        console.log("current status of the raceTracker is : ", this.raceTracker);
+        console.log(util.inspect(this.raceTracker, { depth: null }));
+        const existingRaceIds: string[] = Object.keys(this.raceTracker);
+        const currentTime = new Date();
+        console.log("-----------current Time is : ", currentTime);
+        existingRaceIds.forEach((currentRaceId) => {
+            const currentRaceInfo: RaceSimulation = this.raceTracker[currentRaceId];
+            if (!currentRaceId) {
+                return;
+            }
+            let latestTime = 0;
+            const humanPlayerTracker: { [playerId: string]: HumanPlayerActivityInfo } = currentRaceInfo.humanPlayers;
+            if (!humanPlayerTracker) {
+                return;
+            }
+            Object.keys(humanPlayerTracker).forEach(playerId => {
+                latestTime = Math.max(latestTime, humanPlayerTracker[playerId].lastActivity.getTime());
+            });
+            //getTime method returns time in millisecond passed since 1970 which is same as returned by Date.now()
+
+            if (currentTime.getTime() - latestTime > this.GARBAGE_COLLECTION_TIME_INTERVAL) {
+                console.log("before garbage collection, raceTracker status is :");
+                console.log(util.inspect(this.raceTracker, { depth: null }));
+                clearInterval(<SetIntervalType>currentRaceInfo.setIntervalPointer);
+                delete this.raceTracker[currentRaceId];
+                console.log("interval is removed");
+                console.log("race with RaceId: ", currentRaceId, "has been garbage collected");
+                console.log("after garbage collection, update raceTracker status is :");
+                console.log(util.inspect(this.raceTracker, { depth: null }));
+                console.log("-----------current Time is : ", currentTime);
+            }
+        });
+        console.log("---------------------------------------END OF GARBAGE COLLECTION EVENT---------------------------------");
+        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     }
 
 
     assignTracks(givenTracks: { segments: number[]; name: string; id: number; }[]): Track[] {
-        console.log("_______________________");
+        console.log("The Tracks are -------------------");
         console.log(givenTracks);
         return givenTracks.map((element: { segments: number[]; name: string; id: number; }) => {
-            console.log("segments is :", element.segments);
             const singleTrack: Track = {
                 name: element.name,
                 id: element.id,
@@ -58,6 +112,7 @@ export default class RaceManager {
         });
     }
 
+
     getCars(): any {
         return this.cars;
     }
@@ -65,7 +120,6 @@ export default class RaceManager {
     getTracks(): any {
         return this.tracks;
     }
-
 
 
     /**
@@ -94,8 +148,8 @@ export default class RaceManager {
             hostId: playerId,
             Cars: this.cars,
             Results: currentRaceStatus
-        }
-;
+        };
+
         const newRaceSimulation: RaceSimulation = {
             setIntervalPointer: undefined,
             raceInfo: newRaceInfo,
@@ -105,14 +159,16 @@ export default class RaceManager {
             }
         };
 
-
         // carefully mind the  difference of '.' and bracket notation, '.' notation search for string equivalent of variable name whereas
         // bracket notation replace the variable with it's value unless the variable is a string itself
-        newRaceSimulation.humanPlayers[playerId] = -1;
-        console.log("playerId is : ", playerId);
-        console.log("new raceSimulation generated is : ", newRaceSimulation);
+        const hostPlayerActivity : HumanPlayerActivityInfo= {
+            lastActivity: new Date(),
+            accelerationAttempts: []
+        }
 
-        this.raceTracker[randomRaceId] = newRaceSimulation
+        newRaceSimulation.humanPlayers[playerId] = hostPlayerActivity;
+        this.raceTracker[randomRaceId] = newRaceSimulation;
+        console.log("new raceTracker is : ", util.inspect(this.raceTracker, { depth: null }));
         return newRaceInfo;
         /**
             both typecasting and lefthandside type declaration are not same ,it's not just matter of preference, you can
@@ -133,85 +189,88 @@ export default class RaceManager {
             throw new Error("Invalid requested for race, either race has already been started or race doesn't exists");
         }
         let counter = 0;
-        this.printStatus(counter, currentRaceSimulation);
-        console.log("before starting the race : ", currentRaceSimulation.raceInfo.Results.positions);
         currentRaceSimulation.raceInfo.Results.status = ProgressStatus.IN_PROGRESS;
         currentRaceSimulation.setIntervalPointer = setInterval(() => {
             let playerPositions: CarPositionInfo[] = currentRaceSimulation.raceInfo.Results.positions;
             this.shuffleArray(playerPositions);
-            playerPositions = playerPositions.map(this.updateRaceProgressStatus(currentRaceSimulation));
+            playerPositions.forEach(this.updateRaceProgressStatus(currentRaceSimulation));
             ++counter;
-            this.printStatus(counter, currentRaceSimulation, playerPositions);
-            // console.log(playerPositions);
+
+            console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            console.log("current status of the race tracker is : ");
+            /**
+               Basically console.log will not go through long and complex object, and may decide to just print [Object] instead.
+               JSON.stringify trick can be used to get the whole structure of the object, but that would not look pleasant to the eyes
+               A good way to prevent that in node.js is to use core module in nodejs 'util' so below is example of using 'util.inspect'
+             */
+            console.log(util.inspect(this.raceTracker, { depth: null }));
+            // console.log(JSON.stringify(this.raceTracker));
         }, this.TIMER_INTERVAL);
 
         return true;
     }
 
 
-    updateRaceProgressStatus(currentRaceSimulation: RaceSimulation, speedIncrease?: boolean) {
+    updateRaceProgressStatus(currentRaceSimulation: RaceSimulation) {
 
         return (carPositionInfo: CarPositionInfo) => {
             let { speed, distanceTravelled, acceleration, topSpeed, id } = carPositionInfo;
             const currentTrackLength: number = currentRaceSimulation.raceInfo.Track.length;
-            console.log("current player is : ", carPositionInfo);
             if (distanceTravelled < currentTrackLength) {
-                console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", currentRaceSimulation.humanPlayers[id]);
 
-                //adding randomness in the accelaration to increase the toughness of the game for the human player
-                let currentDeAcceleration = this.frictionDeAcceleration;
-
-                if (speedIncrease) {
-                    // acceleration = Math.floor(Math.random() * (acceleration)) + 1;
-                    acceleration = Math.floor(Math.random() * (acceleration)) + 1;  // from 0 to 5, i.e 6 number range 0-5 where 0 & 5 are inclusive
-                    currentDeAcceleration = this.getRandomRealNumberRange(0, currentDeAcceleration);
-                } else {
-                    if (currentRaceSimulation.humanPlayers[id]) {
-                        acceleration = 0;
-                    } else {
-                        if (currentDeAcceleration > acceleration) {
-                            currentDeAcceleration = this.getRandomRealNumberRange(0, acceleration / 2);
+                const oldSpeed: number = speed;
+                let speedIncreaseTimes = 1;
+                const playerActivityInfo: HumanPlayerActivityInfo = currentRaceSimulation.humanPlayers[id];
+                if (playerActivityInfo) {
+                    const currentTime: number = new Date().getTime();
+                    let timeStampts = playerActivityInfo.accelerationAttempts;
+                    speedIncreaseTimes = 0;
+                    const n = timeStampts.length;
+                    const maxTimes = Math.floor(Math.random() * (2)) + 1;
+                    let k = Math.min(timeStampts.length, maxTimes);
+                    for (let i = n - 1; k > 0; --i) {
+                         // if current time and last time accelerated diff is greater than specified timer i.e 1 second here
+                        if (currentTime - timeStampts[i].getTime() > this.TIMER_INTERVAL) {
+                            break;
                         }
+                        ++speedIncreaseTimes;
+                        --k;
+                    }
+                    timeStampts.splice(0, n);
+                    if (speedIncreaseTimes == 0) {
+                        speedIncreaseTimes = 1;
+                        acceleration = -acceleration;
                     }
                 }
 
-
-                const netAcceleration: number = acceleration - currentDeAcceleration;
-                const oldSpeed: number = speed;
+                let newSpeed = Math.min(topSpeed, Math.max(0, oldSpeed + ((speedIncreaseTimes * acceleration) * this.millSecondtoSeconds(this.TIMER_INTERVAL))));
 
                 let distanceTravelledForInterval;
                 if (oldSpeed == topSpeed) {
-                    distanceTravelledForInterval = (netAcceleration <= 0) ? 0 : oldSpeed * this.millSecondtoSeconds(this.TIMER_INTERVAL);
+                    distanceTravelledForInterval = oldSpeed * this.millSecondtoSeconds(this.TIMER_INTERVAL);
                 }
                 else {
-                    distanceTravelledForInterval = Math.max(0, oldSpeed + ((1 / 2) * netAcceleration * this.millSecondtoSeconds(this.TIMER_INTERVAL)));
+                    distanceTravelledForInterval = (Math.pow(newSpeed, 2) - Math.pow(oldSpeed, 2)) / (2 * acceleration);
                 }
-
-                console.log("netAcceleration is : ", netAcceleration);
-                console.log("time in seconds is : ", this.millSecondtoSeconds(this.TIMER_INTERVAL));
-                console.log("top speed is : ", topSpeed);
-                let newSpeed = Math.min(topSpeed, Math.max(0, oldSpeed + (netAcceleration * this.millSecondtoSeconds(this.TIMER_INTERVAL))));
 
                 let totalDistanceTravelled: number = distanceTravelled + distanceTravelledForInterval;
 
                 if (totalDistanceTravelled >= currentTrackLength) {
                     newSpeed = 0;
                     totalDistanceTravelled = currentTrackLength;
-                    // carPositionInfo.finalPosition = Date.now();
                     if (!carPositionInfo.finalPosition) {
                         carPositionInfo.finalPosition = ++currentRaceSimulation.completedRaceCount;
                     }
 
                     if (currentRaceSimulation.completedRaceCount == currentRaceSimulation.raceInfo.Cars.length) {
                         clearInterval(<SetIntervalType>currentRaceSimulation.setIntervalPointer);
+
                         currentRaceSimulation.raceInfo.Results.status = ProgressStatus.FINISHED;
                     }
                 }
 
                 carPositionInfo.distanceTravelled = totalDistanceTravelled;
                 carPositionInfo.speed = newSpeed;
-                console.log("old speed is : ", oldSpeed);
-                console.log("new speed is : ", newSpeed);
             }
 
             return carPositionInfo;
@@ -223,17 +282,6 @@ export default class RaceManager {
     getRandomRealNumberRange(min: number, max: number): number {
         return Math.random() * (max - min + 1) + min;
     }
-
-
-    printStatus(counter: number, ...all : any) {
-        console.log("-------------------------------------------------------------------------------------");
-        console.log("at stage : ", counter, " value is :");
-        for (let i = 0; i < all.length; ++i) {
-            console.log(all[i]);
-        }
-        console.log("-------------------------------------------------------------------------------------");
-    }
-
 
 
     accelerateCar(raceId: number, playerId: number) {
@@ -252,11 +300,12 @@ export default class RaceManager {
             throw new Error("Race is not in progress, acceleration is not possible");
         }
 
-        const callback: Function = this.updateRaceProgressStatus(currentRaceSimulation, true);
-        callback(playerCarPositionInfo[0]);
+        const playerActivityInfo: HumanPlayerActivityInfo = currentRaceSimulation.humanPlayers[playerId];
+        const currentTime = new Date();
+        playerActivityInfo.accelerationAttempts.push(currentTime);
+        playerActivityInfo.lastActivity = currentTime;
         return true;
     }
-
 
 
     getRaceInfoById(raceId: number): Nullable<CurrentRaceStatus> {
