@@ -1,0 +1,50 @@
+{
+    "status": "in-progress",
+    "positions": [
+        {
+            "id": 1,
+            "driver_name": "Racer 1",
+            "top_speed": 650,
+            "acceleration": 8,
+            "handling": 7,
+            "speed": 8,
+            "segment": 0
+        },
+        {
+            "id": 2,
+            "driver_name": "Racer 2",
+            "top_speed": 600,
+            "acceleration": 9,
+            "handling": 9,
+            "speed": 0,
+            "segment": 0
+        },
+        {
+            "id": 3,
+            "driver_name": "Racer 3",
+            "top_speed": 500,
+            "acceleration": 10,
+            "handling": 6,
+            "speed": 10,
+            "segment": 0
+        },
+        {
+            "id": 4,
+            "driver_name": "Racer 4",
+            "top_speed": 550,
+            "acceleration": 7,
+            "handling": 8,
+            "speed": 7,
+            "segment": 0
+        },
+        {
+            "id": 5,
+            "driver_name": "Racer 5",
+            "top_speed": 700,
+            "acceleration": 5,
+            "handling": 4,
+            "speed": 5,
+            "segment": 0
+        }
+    ]
+}

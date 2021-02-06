@@ -1,12 +1,12 @@
 /**
  * holds various information frequently needed for this game player
- * @type {{track_id: undefined, race_id: undefined, race_track_length: undefined, racer_id: undefined}}
+ * @type {{trackId: undefined, raceId: undefined, raceTrackLength: undefined, racerId: undefined}}
  */
 const store = {
-    track_id: undefined,
-    racer_id: undefined,
-    race_id: undefined,
-    race_track_length: undefined
+    trackId: undefined,
+    racerId: undefined,
+    raceId: undefined,
+    raceTrackLength: undefined
 }
 
 
@@ -106,7 +106,7 @@ function setupClickHandlers() {
             if (reqTarget) {
                 event.preventDefault();
 
-                if (!(store['track_id'] && store['racer_id'])) {
+                if (!(store['trackId'] && store['racerId'])) {
                     alert("You must submit both track and race car");
                     return;
                 }
@@ -152,23 +152,23 @@ async function handleCreateRace() {
 
     try {
         // render starting UI
-        renderAt('#bottom', renderRaceStartView(store["track_id"]));
+        renderAt('#bottom', renderRaceStartView(store["trackId"]));
 
-        const {racer_id, track_id} = store;
+        const {racerId, trackId} = store;
 
-        const race = await createRace(racer_id, track_id);
+        const race = await createRace(racerId, trackId);
 
-        store['race_id'] = parseInt(race['ID']) - 1;
+        store['raceId'] = parseInt(race['ID']);
 
-        store['race_track_length'] = race['Track']['segments'].length;
+        store['raceTrackLength'] = race['Track'].length;
 
         // The race has been created, now starting the countdown
 
         await runCountdown();
 
-        await startRace(store['race_id']);
+        await startRace(store['raceId']);
 
-        await runRace(store['race_id']);
+        await runRace(store['raceId']);
     } catch(ex) {
         alert("There occured some error while creating and starting the race, please try after some time");
         //we can send exceptions object information to server for logging and error monitoring
@@ -296,20 +296,20 @@ function stringToFragment(string) {
  */
 function handleAccelerate() {
 
-    if(store['race_id']) {
-        getRace(store['race_id'])
+    if(store['raceId']) {
+        getRace(store['raceId'])
             .then((statusResponse) => {
 
                 if(statusResponse['status'] === "unstarted") {
                     alert("Race has not started yet, please wait for timer countdown");
                     return;
                 }
-                if(store['racer_completion_progress'] === 100) {
+                if(store['racerCompletionProgress'] === 100) {
                     alert("You have already completed the Race");
                     return;
                 }
 
-                accelerate(store['race_id'])
+                accelerate(store['raceId'])
                     .then(() => {
                         return;
                     });
@@ -355,16 +355,16 @@ function renderRacerCars(racers) {
 function renderRacerCard(racer) {
     const {
         id,
-        driver_name,
-        top_speed,
+        driverName,
+        topSpeed,
         acceleration,
         handling
     } = racer;
 
     return `
 		<li class="card racer" id="${id}">
-			<h3>Driver Name - ${driver_name}</h3>
-			<p>Top Speed - ${top_speed}</p>
+			<h3>Driver Name - ${driverName}</h3>
+			<p>Top Speed - ${topSpeed}</p>
 			<p>Acceleration - ${acceleration}</p>
 			<p>Handling - ${handling}</p>
 		</li>
@@ -385,7 +385,7 @@ function renderTrackCards(tracks) {
     }
 
     const results = tracks.map(renderTrackCard).join('')
-    return ` 
+    return `
 			${results}
 
 	`
@@ -426,13 +426,13 @@ function renderCountdown(count) {
 
 /**
  *
- * @param track_id
+ * @param trackId
  * @returns {string}
  */
-function renderRaceStartView(track_id) {
+function renderRaceStartView(trackId) {
     return `
 		<header>
-			<h1>Race: ${track_id}</h1>
+			<h1>Race: ${trackId}</h1>
 		</header>
 		<div id="display_panel">
 			<section id="leaderBoard" >
@@ -460,7 +460,8 @@ function renderRaceStartView(track_id) {
  * @returns {string}
  */
 function resultsView(positions) {
-    positions.sort((a, b) => (a.final_position > b.final_position) ? 1 : -1)
+    //represen the final leaderboard position like 1st rank has 1 as finalPosition, then 2 and so on..
+    positions.sort((a, b) => (a.finalPosition < b.finalPosition) ? -1 : 1)
 
     return `
         <div id="results">
@@ -474,11 +475,11 @@ function resultsView(positions) {
                  ${currentProgress(positions)}
                 </table>
             </section>
-            
+
             <div>
                 <p style="text-align: center"><a href="/race">Race again</a></p>
             </div>
-	    </div>		
+	    </div>
 	`;
 }
 
@@ -505,7 +506,7 @@ function showFields(objectFields, position) {
 
     const result = [];
     result.push(getLiView(position));
-    result.push(getLiView(objectFields['driver_name']));
+    result.push(getLiView(objectFields['driverName']));
 
     return result.join(' ');
 }
@@ -518,7 +519,7 @@ function showFields(objectFields, position) {
  */
 function getCarInfo(objectInfo) {
 
-   return `<ul>  <li style="display: inline-block; overflow-x: auto;">${objectInfo['driver_name']}</li>
+   return `<ul>  <li style="display: inline-block; overflow-x: auto;">${objectInfo['driverName']}</li>
         <li>${objectInfo['speed']} km/h</li>
         </ul>
         `;
@@ -535,26 +536,26 @@ function getView(positions) {
     const allTracksView = positions.map((element) => {
         const currentProgress = getProgressReport(element);
         let carInfoView = "carInfoView"
-        if(element['id'] === store["racer_id"]) {
-            element['driver_name'] += "     (You)";
-            store['racer_completion_progress'] = currentProgress;
+        if(element['id'] === store["racerId"]) {
+            element['driverName'] += "     (You)";
+            store['racerCompletionProgress'] = currentProgress;
             carInfoView += ` myCar`;
 
         }
         return ` <div class="trackView">
-            
+
                     <div class="progressView">
                         <p>${currentProgress} %</p>
                     </div>
-                    
+
                     <div class="mainTrack">
-                    
+
                         <div class="carView" style="top:${100 - currentProgress}%;">
-                        </div> 
-                        
+                        </div>
+
                     </div>
                      <div class="carStart">
-                    
+
                     </div>
                      <div class="${carInfoView}" style="font-size: 15px;">
                             ${getCarInfo(element)}
@@ -574,27 +575,27 @@ function getView(positions) {
  * @returns {string}
  */
 function raceInProgress(positions) {
-    // positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1);
+    // positions = positions.sort((a, b) => (a.distanceTravelled > b.distanceTravelled) ? -1 : 1);
 
     const graphicalUI = `
                 <h1>Race Progress</h1>
                 <div id="raceArea">
                  <div class="trackView" style="background-color: inherit;">
-            
+
                     <div class="progressView" style="border-radius: 3px">
                         <p> Race completion-> </p>
                     </div>
-                    
+
                     <div class="mainTrack" style="border: 0px">
-                    
+
                     </div>
                     <div class="carStart" style="background-color: inherit; border: 0px;">
-                    
+
                     </div>
                      <div class="carInfoView" style="font-size: 15px; border-radius: 5px">
                            <ul>
                                  <li> Racer Name-> </li>
-                                 <li> Current Speed-> </li> 
+                                 <li> Current Speed-> </li>
                            </ul>
                      </div>
                 </div>
@@ -611,7 +612,7 @@ function raceInProgress(positions) {
  * @returns {number}
  */
 function getProgressReport(objectFields) {
-    const percentageProgress = (objectFields['segment'] / store['race_track_length']) * 100;
+    const percentageProgress = (objectFields['distanceTravelled'] / store['raceTrackLength']) * 100;
     return Math.round(percentageProgress * 100) / 100;
 }
 
@@ -625,9 +626,9 @@ function currentProgress(positions) {
 
     const results = positions.map((element, index) => {
         const racerProgress = getProgressReport(element);
-        if(element['id'] === store["racer_id"]) {
-            element['driver_name'] += "(you)";
-            store['racer_completion_progress'] = racerProgress;
+        if(element['id'] === store["racerId"]) {
+            element['driverName'] += "(you)";
+            store['racerCompletionProgress'] = racerProgress;
 
             return `
                     <tr id="you">
@@ -665,8 +666,8 @@ function renderAt(element, html) {
 // API CALLS ------------------------------------------------
 
 
-
- const SERVER = 'http://localhost:8000';
+// no need as frontend and backend are running on same host and port
+ const SERVER = '';
 
 
  /* *
@@ -679,6 +680,7 @@ function defaultFetchOpts() {
         headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': SERVER,
+            'playerId': store['racerId']
         }
     }
 }
@@ -721,14 +723,14 @@ function getRacers() {
 
 /***
  * POST request to `${SERVER}/api/races`
- * @param player_id
- * @param track_id
+ * @param playerId
+ * @param trackId
  * @returns {Promise<Response | void>}
  */
-function createRace(player_id, track_id) {
+function createRace(playerId, trackId) {
     const body = {
-        player_id,
-        track_id
+        playerId,
+        trackId
     }
 
     return fetch(`${SERVER}/api/races`, {
