@@ -519,11 +519,28 @@ function showFields(objectFields, position) {
  */
 function getCarInfo(objectInfo) {
 
-   return `<ul>  <li style="display: inline-block; overflow-x: auto;">${objectInfo['driverName']}</li>
-        <li>${objectInfo['speed']} km/h</li>
+    return `<ul class=driverInfo>
+        <li style="display: inline-block;" title="checking">${getFormattedName(objectInfo['driverName'])}</li>
+        <li>${Math.floor(objectInfo['speed'])} km/h</li>
         </ul>
         `;
 
+}
+
+
+function getFormattedName(driverName) {
+    console.log("driver name is : ", driverName);
+    const nameLength = driverName.length;
+    let updatedName = driverName;
+    if (nameLength > 15) {
+        const firstPart = driverName.substring(0, 5);
+        const secondPart = driverName.substring(nameLength - 7, nameLength);
+        console.log("first part ", firstPart);
+        console.log("second part: ", secondPart);
+        updatedName =  firstPart+ "..." + secondPart;
+    }
+    console.log("updated name is : ", updatedName);
+    return updatedName;
 }
 
 
@@ -537,10 +554,9 @@ function getView(positions) {
         const currentProgress = getProgressReport(element);
         let carInfoView = "carInfoView"
         if(element['id'] === store["racerId"]) {
-            element['driverName'] += "     (You)";
+            element['driverName'] = "(You) " + element['driverName'];
             store['racerCompletionProgress'] = currentProgress;
             carInfoView += ` myCar`;
-
         }
         return ` <div class="trackView">
 
