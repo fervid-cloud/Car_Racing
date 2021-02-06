@@ -116,17 +116,36 @@ raceController.get("/races/:id", (req: Request, res: Response) => {
    - Returns nothing
  */
 raceController.post("/races/:id/accelerate", (req, res) => {
+    /**
+        As the Http standard specifies:
+        Each header field consists of a case-insensitive field name followed by a colon (":") ...
+        so usually the entity which handles the request and response converts the header field into lowercase,
+        so keep check of that
+    */
+    // let playerId: string | string[] | undefined = req.headers.racerId;
 
-    raceService.accelerateCar(parseInt(req.params.id), (err: Error, accelerateCarStatus: any) => {
+    let playerId: string | undefined = req.headers.playerid as string;
+    console.log("playerId is : ", playerId);
+    if (!playerId) {
+        res.send({ error: "invalid playerId sent" });
+        return;
+    }
+    raceService.accelerateCar(parseInt(req.params.id), parseInt(playerId), (err: Error, accelerateCarStatus: any) => {
         if (err) {
             // next(new Error("some error occured while accelerating the car"));
-            res.send({ error: "testing" });
+            res.send(err);
             return;
         }
 
         res.send(accelerateCarStatus);
     });
 });
+
+
+function isArrayOfStrings(value: any): boolean {
+    return Array.isArray(value) && value.every(item => typeof item === "string");
+}
+
 
 
 

@@ -23,7 +23,7 @@ export default class RaceManager {
 
     private MinRaceId: number;
 
-    private raceTracker : { [race_id: number ] : RaceSimulation } = {};
+    private raceTracker : { [raceId: number ] : RaceSimulation } = {};
 
     private TIMER_INTERVAL: number;
 
@@ -38,7 +38,7 @@ export default class RaceManager {
         this.MaxRaceId = (1 << 30);
         this.MinRaceId = 1;
         this.TIMER_INTERVAL = 1000;
-        this.frictionDeAcceleration = 5; //m/s
+        this.frictionDeAcceleration = 2; //m/s
     }
 
 
@@ -139,60 +139,68 @@ export default class RaceManager {
         currentRaceSimulation.setIntervalPointer = setInterval(() => {
             let playerPositions: CarPositionInfo[] = currentRaceSimulation.raceInfo.Results.positions;
             this.shuffleArray(playerPositions);
-            playerPositions = playerPositions.map((carPositionInfo: CarPositionInfo) => {
-                let { speed, distanceTravelled, acceleration, topSpeed, id } = carPositionInfo;
-                const currentTrackLength: number = currentRaceSimulation.raceInfo.Track.length;
-                console.log("current player is : ", carPositionInfo);
-                if (distanceTravelled < currentTrackLength) {
-                    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", currentRaceSimulation.humanPlayers[id]);
-                    if (currentRaceSimulation.humanPlayers[id]) {
-                        acceleration = 0;
-                    }
-
-                    const netAcceleration : number = acceleration - this.frictionDeAcceleration;
-                    const oldSpeed: number = speed;
-
-                    let distanceTravelledForInterval;
-                    if (oldSpeed == topSpeed) {
-                        distanceTravelledForInterval = (netAcceleration <= 0) ? 0 : oldSpeed * this.millSecondtoSeconds(this.TIMER_INTERVAL);
-                    }
-                    else {
-                        distanceTravelledForInterval = Math.max(0, oldSpeed + ((1 / 2) * netAcceleration * this.millSecondtoSeconds(this.TIMER_INTERVAL)));
-                    }
-
-                    console.log("netAcceleration is : ", netAcceleration);
-                    console.log("time in seconds is : ", this.millSecondtoSeconds(this.TIMER_INTERVAL));
-                    console.log("top speed is : ", topSpeed);
-                    let newSpeed = Math.min(topSpeed, Math.max(0, oldSpeed + (netAcceleration * this.millSecondtoSeconds(this.TIMER_INTERVAL))));
-
-                    let totalDistanceTravelled: number = distanceTravelled + distanceTravelledForInterval;
-
-                    if (totalDistanceTravelled >= currentTrackLength) {
-                        newSpeed = 0;
-                        totalDistanceTravelled = currentTrackLength;
-                        // carPositionInfo.finalPosition = Date.now();
-                        carPositionInfo.finalPosition = ++currentRaceSimulation.completedRaceCount;
-
-                        if (currentRaceSimulation.completedRaceCount == currentRaceSimulation.raceInfo.Cars.length) {
-                            clearInterval(<SetIntervalType>currentRaceSimulation.setIntervalPointer);
-                            currentRaceSimulation.raceInfo.Results.status = ProgressStatus.FINISHED;
-                        }
-                    }
-
-                    carPositionInfo.distanceTravelled = totalDistanceTravelled;
-                    carPositionInfo.speed = newSpeed;
-                    console.log("old speed is : ", oldSpeed);
-                    console.log("new speed is : ", newSpeed);
-                }
-
-                return carPositionInfo;
-            });
+            playerPositions = playerPositions.map(this.updateRaceProgressStatus(currentRaceSimulation));
             ++counter;
             this.printStatus(counter, currentRaceSimulation, playerPositions);
             // console.log(playerPositions);
         }, this.TIMER_INTERVAL);
 
         return true;
+    }
+
+
+    updateRaceProgressStatus(currentRaceSimulation: RaceSimulation, speedIncrease?: boolean) {
+
+        return (carPositionInfo: CarPositionInfo) => {
+            let { speed, distanceTravelled, acceleration, topSpeed, id } = carPositionInfo;
+            const currentTrackLength: number = currentRaceSimulation.raceInfo.Track.length;
+            console.log("current player is : ", carPositionInfo);
+            if (distanceTravelled < currentTrackLength) {
+                console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", currentRaceSimulation.humanPlayers[id]);
+                if (currentRaceSimulation.humanPlayers[id] && !speedIncrease) {
+                    acceleration = 0;
+                }
+
+                const netAcceleration: number = acceleration - this.frictionDeAcceleration;
+                const oldSpeed: number = speed;
+
+                let distanceTravelledForInterval;
+                if (oldSpeed == topSpeed) {
+                    distanceTravelledForInterval = (netAcceleration <= 0) ? 0 : oldSpeed * this.millSecondtoSeconds(this.TIMER_INTERVAL);
+                }
+                else {
+                    distanceTravelledForInterval = Math.max(0, oldSpeed + ((1 / 2) * netAcceleration * this.millSecondtoSeconds(this.TIMER_INTERVAL)));
+                }
+
+                console.log("netAcceleration is : ", netAcceleration);
+                console.log("time in seconds is : ", this.millSecondtoSeconds(this.TIMER_INTERVAL));
+                console.log("top speed is : ", topSpeed);
+                let newSpeed = Math.min(topSpeed, Math.max(0, oldSpeed + (netAcceleration * this.millSecondtoSeconds(this.TIMER_INTERVAL))));
+
+                let totalDistanceTravelled: number = distanceTravelled + distanceTravelledForInterval;
+
+                if (totalDistanceTravelled >= currentTrackLength) {
+                    newSpeed = 0;
+                    totalDistanceTravelled = currentTrackLength;
+                    // carPositionInfo.finalPosition = Date.now();
+                    if (!carPositionInfo.finalPosition) {
+                        carPositionInfo.finalPosition = ++currentRaceSimulation.completedRaceCount;
+                    }
+
+                    if (currentRaceSimulation.completedRaceCount == currentRaceSimulation.raceInfo.Cars.length) {
+                        clearInterval(<SetIntervalType>currentRaceSimulation.setIntervalPointer);
+                        currentRaceSimulation.raceInfo.Results.status = ProgressStatus.FINISHED;
+                    }
+                }
+
+                carPositionInfo.distanceTravelled = totalDistanceTravelled;
+                carPositionInfo.speed = newSpeed;
+                console.log("old speed is : ", oldSpeed);
+                console.log("new speed is : ", newSpeed);
+            }
+
+            return carPositionInfo;
+        }
     }
 
 
@@ -206,8 +214,26 @@ export default class RaceManager {
     }
 
 
-    accelerateCar(raceId: string, callback: Function) {
 
+    accelerateCar(raceId: number, playerId: number) {
+        const currentRaceSimulation: RaceSimulation = this.raceTracker[raceId];
+
+        if (!currentRaceSimulation) {
+            throw new Error("Invalid requested for race, either race has expired or race doesn't exists");
+        }
+
+        const playerCarPositionInfo = currentRaceSimulation.raceInfo.Results.positions.filter(carPositionInfo => carPositionInfo.id == playerId);
+        if (playerCarPositionInfo.length == 0) {
+            throw new Error("Invalid playerId");
+        }
+
+        if(currentRaceSimulation.raceInfo.Results.status !== ProgressStatus.IN_PROGRESS) {
+            throw new Error("Race is not in progress, acceleration is not possible");
+        }
+
+        const callback: Function = this.updateRaceProgressStatus(currentRaceSimulation, true);
+        callback(playerCarPositionInfo[0]);
+        return true;
     }
 
 
@@ -223,7 +249,7 @@ export default class RaceManager {
 
 
     /**
-     * shuffling through Fisher–Yates shuffle algorithm
+     * Shuffling through Fisher–Yates algorithm
      * @param playerPositions
      */
     shuffleArray(playerPositions: Position[]) {

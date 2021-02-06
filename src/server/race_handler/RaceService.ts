@@ -52,19 +52,19 @@ export default class RaceService {
         try {
             response = this.raceManager.startRaceById(raceId);
         } catch (ex) {
-            error = new Error("Race Couldn't be started");
+            error = this.composeError("some error occured while starting the race", ex);
         } finally {
             callback(error, response);
         }
     }
 
 
-    accelerateCar(raceId: number, callback: Function) {
+    accelerateCar(raceId: number, playerId: number, callback: Function) {
         let error = null, response = null;
         try {
-            response = this.raceManager.startRaceById(raceId);
+            response = this.raceManager.accelerateCar(raceId, playerId);
         } catch (ex) {
-            error = new Error("some error occured while accelerating the car");
+            error = this.composeError("some error occured while accelerating the race", ex);
         } finally {
             callback(error, response);
         }
