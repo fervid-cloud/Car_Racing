@@ -6,9 +6,10 @@ import { Service } from "typedi";
 import jsonData from '../model/data.json';
 import RaceInfo from "model/RaceInfo";
 import Position from "model/CarPositionInfo";
-import RaceSimulation from "model/RaceSimulation";
+import { RaceSimulation } from "model/RaceSimulation";
 import { Nullable, SetIntervalType } from "custom-type-definition";
 import CarPositionInfo from "model/CarPositionInfo";
+import { HumanPlayerActivityInfo } from "model/RaceSimulation";
 
 @Service()
 export default class RaceManager {
@@ -27,8 +28,7 @@ export default class RaceManager {
 
     private TIMER_INTERVAL: number;
 
-    private frictionDeAcceleration: number;
-
+    // private frictionDeAcceleration: number;
     constructor() {
         this.data = jsonData;
         this.cars = this.data['cars'];
@@ -38,7 +38,7 @@ export default class RaceManager {
         this.MaxRaceId = (1 << 30);
         this.MinRaceId = 1;
         this.TIMER_INTERVAL = 1000;
-        this.frictionDeAcceleration = 5; //m/s
+        // this.frictionDeAcceleration = 0; //m/s
     }
 
 
@@ -94,8 +94,8 @@ export default class RaceManager {
             hostId: playerId,
             Cars: this.cars,
             Results: currentRaceStatus
-        }
-;
+        };
+
         const newRaceSimulation: RaceSimulation = {
             setIntervalPointer: undefined,
             raceInfo: newRaceInfo,
@@ -105,10 +105,15 @@ export default class RaceManager {
             }
         };
 
-
         // carefully mind the  difference of '.' and bracket notation, '.' notation search for string equivalent of variable name whereas
         // bracket notation replace the variable with it's value unless the variable is a string itself
-        newRaceSimulation.humanPlayers[playerId] = -1;
+        const hostPlayerActivity : HumanPlayerActivityInfo= {
+            lastActivity: Date.now(),
+            accelerationAttempts: []
+        }
+
+        newRaceSimulation.humanPlayers[playerId] = hostPlayerActivity;
+
         console.log("playerId is : ", playerId);
         console.log("new raceSimulation generated is : ", newRaceSimulation);
 
@@ -149,7 +154,7 @@ export default class RaceManager {
     }
 
 
-    updateRaceProgressStatus(currentRaceSimulation: RaceSimulation, speedIncrease?: boolean) {
+    updateRaceProgressStatus(currentRaceSimulation: RaceSimulation) {
 
         return (carPositionInfo: CarPositionInfo) => {
             let { speed, distanceTravelled, acceleration, topSpeed, id } = carPositionInfo;
@@ -157,41 +162,39 @@ export default class RaceManager {
             console.log("current player is : ", carPositionInfo);
             if (distanceTravelled < currentTrackLength) {
                 console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", currentRaceSimulation.humanPlayers[id]);
+                const oldSpeed: number = speed;
 
-                //adding randomness in the accelaration to increase the toughness of the game for the human player
-                let currentDeAcceleration = this.frictionDeAcceleration;
-
-                if (speedIncrease) {
-                    // acceleration = Math.floor(Math.random() * (acceleration)) + 1;
-                    acceleration = Math.floor(Math.random() * (acceleration)) + 1;  // from 0 to 5, i.e 6 number range 0-5 where 0 & 5 are inclusive
-                    currentDeAcceleration = this.getRandomRealNumberRange(0, currentDeAcceleration);
-                } else {
-                    if (currentRaceSimulation.humanPlayers[id]) {
-                        acceleration = 0;
-                    } else {
-                        if (currentDeAcceleration > acceleration) {
-                            currentDeAcceleration = this.getRandomRealNumberRange(0, acceleration / 2);
+                let speedIncreaseTimes = 1;
+                const playerActivityInfo: HumanPlayerActivityInfo = currentRaceSimulation.humanPlayers[id];
+                if (playerActivityInfo) {
+                    const currentTime: number = Date.now();
+                    // if current time and last time accelerated diff is greater than specified timer i.e 1 second here
+                    let timeStampts = playerActivityInfo.accelerationAttempts;
+                    const n = timeStampts.length;
+                    let k = Math.min(timeStampts.length, 3);
+                    for (let i = n - 1; k > 0; --i) {
+                        if (currentTime - timeStampts[i] > this.TIMER_INTERVAL) {
+                            break;
                         }
+                        ++speedIncreaseTimes;
+                        --k;
                     }
+                    timeStampts.slice(0, n);
+                    speedIncreaseTimes -= 2; // equivalent of setting this variable first as 0 at start in this block of scope then doing -1, here
                 }
 
-
-                const netAcceleration: number = acceleration - currentDeAcceleration;
-                const oldSpeed: number = speed;
+                let newSpeed = Math.min(topSpeed, Math.max(0, oldSpeed + ((speedIncreaseTimes * acceleration) * this.millSecondtoSeconds(this.TIMER_INTERVAL))));
 
                 let distanceTravelledForInterval;
                 if (oldSpeed == topSpeed) {
-                    distanceTravelledForInterval = (netAcceleration <= 0) ? 0 : oldSpeed * this.millSecondtoSeconds(this.TIMER_INTERVAL);
+                    distanceTravelledForInterval = (speedIncreaseTimes <= 0) ? 0 : oldSpeed * this.millSecondtoSeconds(this.TIMER_INTERVAL);
                 }
                 else {
-                    distanceTravelledForInterval = Math.max(0, oldSpeed + ((1 / 2) * netAcceleration * this.millSecondtoSeconds(this.TIMER_INTERVAL)));
+                    distanceTravelledForInterval = Math.abs((Math.pow(newSpeed, 2) - Math.pow(oldSpeed, 2)) / (2 * acceleration));
                 }
 
-                console.log("netAcceleration is : ", netAcceleration);
                 console.log("time in seconds is : ", this.millSecondtoSeconds(this.TIMER_INTERVAL));
                 console.log("top speed is : ", topSpeed);
-                let newSpeed = Math.min(topSpeed, Math.max(0, oldSpeed + (netAcceleration * this.millSecondtoSeconds(this.TIMER_INTERVAL))));
-
                 let totalDistanceTravelled: number = distanceTravelled + distanceTravelledForInterval;
 
                 if (totalDistanceTravelled >= currentTrackLength) {
@@ -252,8 +255,12 @@ export default class RaceManager {
             throw new Error("Race is not in progress, acceleration is not possible");
         }
 
-        const callback: Function = this.updateRaceProgressStatus(currentRaceSimulation, true);
-        callback(playerCarPositionInfo[0]);
+        // const callback: Function = this.updateRaceProgressStatus(currentRaceSimulation, true);
+        // setTimeout(() => callback(playerCarPositionInfo[0]), 0);
+        const playerActivityInfo: HumanPlayerActivityInfo = currentRaceSimulation.humanPlayers[playerId];
+        const currentTime = Date.now();
+        playerActivityInfo.accelerationAttempts.push(currentTime);
+        playerActivityInfo.lastActivity = currentTime;
         return true;
     }
 

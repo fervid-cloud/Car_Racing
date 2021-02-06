@@ -32,7 +32,7 @@
             "id": 5,
             "driverName": "Racer 5",
             "topSpeed": 700,
-            "acceleration": 5,
+            "acceleration": 6,
             "handling": 4
         }
     ],

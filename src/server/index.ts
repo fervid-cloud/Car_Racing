@@ -5,17 +5,16 @@ const bodyParser = require('body-parser');
 const path = require('path');
 import { Request, Response } from 'express';
 
-
+const port = process.env.PORT || 3500;
 const app = express();
 
-expressOasGenerator.init(app, {});
 
+expressOasGenerator.init(app, {});
 
 //rest apis routers
 const raceTrackerController = require("./race_handler/RaceController");
 
 
-const port = process.env.PORT || 3500;
 
 // setup the ability to see into response bodies
 app.use(bodyParser.urlencoded({ extended: false }))
