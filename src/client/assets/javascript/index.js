@@ -264,7 +264,7 @@ function handleSelection(target, type) {
         target.classList.add(reqClassName);
 
         const html = `
-                    <p id="current${type}" style="font-size: 25px">You Choose This ${type}</p>
+                    <p id="current${type}">You Choose This ${type}</p>
 				  `;
 
         target.appendChild(stringToFragment(html));
