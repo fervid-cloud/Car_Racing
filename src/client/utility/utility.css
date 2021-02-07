@@ -59,7 +59,7 @@ hidden by default))
     /*position: relative;*/
     /*z-order: -10; !* it will not work now as no position except static(which is by default) is specified here *!*/
     width: 100%;
-    padding: 40px;
+    /* padding: 40px; */
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -78,15 +78,15 @@ doesn't matter how you set
     /*left:0;*/
     /*right:0;*/
     background: #fff;
-    width: 450px;
+    /* width: 450px; */
     /*height: 250px;*/ /*will work with internal scrolling for only i.e for scrolling of .box only */
     /*min-height: 220px; */ /*will not work for scrolling i.ei.e for scrolling of .box only*/
-    min-height: 220px; /*setting up a standard height even if content is not much */
+    /* min-height: 220px; /*setting up a standard height even if content is not much */
     z-index: 2;
     text-align: center;
-    padding: 20px;
+    padding: 3.5vmin;
     /*transition: all 300ms ease-out;*/
-    border-radius: 3px;
+    border-radius: 0.5vmin;
     /*overflow: auto;*/
 }
 
@@ -98,14 +98,14 @@ doesn't matter how you set
 }
 
 .contentManager .close {
-    padding: 10px;
-    font-size: 22px;
+    font-size: 3vmin;
     background-color: forestgreen;
-    margin-top: auto;
+    margin: auto 0;
     cursor: pointer;
-    box-shadow: 2px 4px 5px #444;
+    box-shadow: 0.5vmin 1vmin 1.1vmin #444;
     font-family: "Droid Sans Mono";
     color: wheat;
+    padding: 1.5vmin;
 }
 
 .contentManager .close:hover {
@@ -130,12 +130,16 @@ doesn't matter how you set
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
+    margin: auto;
+    /* margin-bottom: 20px; */
+
 }
 
 .contentManager .textContent {
-    font-size: 22px;
+    font-size: 3vmin;
     margin: auto;
     text-align: center;
+    padding: 5vmin 0;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     /*flex-grow: 1;*/
 }

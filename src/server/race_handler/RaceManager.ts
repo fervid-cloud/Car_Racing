@@ -12,6 +12,12 @@ import CarPositionInfo from "model/CarPositionInfo";
 import { HumanPlayerActivityInfo } from "model/RaceSimulation";
 import * as util from 'util';
 
+
+/**
+ * Main class whose object manage the responsibility of managing the different aspect of race
+ * @Service annotation creates a singleton object of it, It is used from typedi library which
+ * manages the singleton objects in the memory
+ */
 @Service()
 export default class RaceManager {
 
@@ -29,7 +35,7 @@ export default class RaceManager {
 
     private TIMER_INTERVAL: number;
 
-    private GARBAGE_COLLECTION_TIME_INTERVAL = 1/2 * 60 * 1000; // 10 minutes in milliseconds
+    private GARBAGE_COLLECTION_TIME_INTERVAL = 5 * 60 * 1000; // 10 minutes in milliseconds
 
     constructor() {
         this.data = jsonData;
@@ -46,6 +52,9 @@ export default class RaceManager {
     }
 
 
+    /**
+     * initialize the garbage collection manager
+     */
     private initializeGarbageCollector(): void {
         /**Note that, the arrow function “inherits” the context from the function where it is defined.
         A regular function in this example would create its own context (window or undefined in strict mode).
@@ -57,6 +66,9 @@ export default class RaceManager {
     }
 
 
+    /**
+     * does the job of garbage collection of unused/expired/finished races
+     */
     evictGarbage(): void {
         console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         console.log("---------------------------------------GARBAGE COLLECTION EVENT---------------------------------");
@@ -97,6 +109,10 @@ export default class RaceManager {
     }
 
 
+    /**
+     *
+     * @param givenTracks
+     */
     assignTracks(givenTracks: { segments: number[]; name: string; id: number; }[]): Track[] {
         console.log("The Tracks are -------------------");
         console.log(givenTracks);
@@ -113,17 +129,24 @@ export default class RaceManager {
     }
 
 
+    /**
+     * get the race cars presently available for race
+     */
     getCars(): any {
         return this.cars;
     }
 
+
+    /**
+     * get the tracks presently available for the race
+     */
     getTracks(): any {
         return this.tracks;
     }
 
 
     /**
-     *
+     * creates a new Race
      * @param playerId
      * @param trackId
      */
@@ -182,6 +205,10 @@ export default class RaceManager {
     }
 
 
+    /**
+     * starts the created race on the basis of the Id of the race
+     * @param raceId
+     */
     startRaceById(raceId: number) : boolean{
 
         const currentRaceSimulation: RaceSimulation = this.raceTracker[raceId];
@@ -211,6 +238,10 @@ export default class RaceManager {
     }
 
 
+    /**
+     * update the status of the race
+     * @param currentRaceSimulation
+     */
     updateRaceProgressStatus(currentRaceSimulation: RaceSimulation) {
 
         return (carPositionInfo: CarPositionInfo) => {
@@ -278,12 +309,21 @@ export default class RaceManager {
     }
 
 
-
+    /**
+     *
+     * @param min
+     * @param max
+     */
     getRandomRealNumberRange(min: number, max: number): number {
         return Math.random() * (max - min + 1) + min;
     }
 
 
+    /**
+     * manages the acceleration of the car mechanism when requested by user
+     * @param raceId
+     * @param playerId
+     */
     accelerateCar(raceId: number, playerId: number) {
         const currentRaceSimulation: RaceSimulation = this.raceTracker[raceId];
 
@@ -308,6 +348,11 @@ export default class RaceManager {
     }
 
 
+    /**
+     * It provides the race current status on the basis of the given race Id,
+     * throws exception if no race of given id is present
+     * @param raceId
+     */
     getRaceInfoById(raceId: number): Nullable<CurrentRaceStatus> {
         console.log("returning the race info---------------------");
         const raceSimulation: RaceSimulation = this.raceTracker[raceId];
@@ -334,6 +379,10 @@ export default class RaceManager {
     }
 
 
+    /**
+     *
+     * @param milliSecondTime
+     */
     millSecondtoSeconds(milliSecondTime: number) {
         return milliSecondTime / 1000;
     }

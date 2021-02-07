@@ -15,17 +15,29 @@ export default class RaceService {
     }
 
 
+    /**
+     *
+     * @param callback
+     */
     getRaceTracks(callback: Function) {
         callback(null, this.raceManager.getTracks());
 
     }
 
 
+    /**
+     *
+     * @param callback
+     */
     getRaceCars(callback: Function) {
         callback(null, this.raceManager.getCars());
     }
 
 
+    /**
+     *
+     * @param raceId
+     */
     getRaceInfoById(raceId: number): Nullable<CurrentRaceStatus> | ErrorResponse {
         try {
             return this.raceManager.getRaceInfoById(raceId);
@@ -35,6 +47,10 @@ export default class RaceService {
     }
 
 
+    /**
+     *
+     * @param createRequestRaceInfo
+     */
     createRace(createRequestRaceInfo: {playerId: number, trackId: number}): Nullable<RaceInfo> | ErrorResponse {
 
         try {
@@ -47,6 +63,11 @@ export default class RaceService {
     }
 
 
+    /**
+     *
+     * @param raceId
+     * @param callback
+     */
     startRaceById(raceId: number, callback: Function) {
         let error = null, response = null;
         try {
@@ -59,6 +80,12 @@ export default class RaceService {
     }
 
 
+    /**
+     *
+     * @param raceId
+     * @param playerId
+     * @param callback
+     */
     accelerateCar(raceId: number, playerId: number, callback: Function) {
         let error = null, response = null;
         try {
@@ -71,7 +98,11 @@ export default class RaceService {
     }
 
 
-
+    /**
+     *
+     * @param errorMessage
+     * @param ex
+     */
     composeError(errorMessage: string, ex: Error): ErrorResponse {
         return {
             error: errorMessage,
