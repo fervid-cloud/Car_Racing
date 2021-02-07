@@ -53,7 +53,7 @@ async function onPageLoad() {
             });
 
     } catch (error) {
-        alert("Error occured while fetching both available racers and tracks, please try after some time");
+        customAlert("Error occured while fetching both available racers and tracks, please try after some time");
         //we can send exceptions object information to server for logging and error monitoring
     }
 }
@@ -107,7 +107,7 @@ function setupClickHandlers() {
                 event.preventDefault();
 
                 if (!(store['trackId'] && store['racerId'])) {
-                    alert("You must submit both track and race car");
+                    customAlert("You must submit both track and race car");
                     return;
                 }
 
@@ -121,7 +121,7 @@ function setupClickHandlers() {
                 handleAccelerate();
             }
         } catch (ex) {
-            alert("Some Error occured while starting the race, please try again after some time");
+            customAlert("Some Error occured while starting the race, please try again after some time");
             //we can send exceptions object information to server for logging and error monitoring
             //we can send exceptions object information to server for logging and error monitoring
         }
@@ -138,7 +138,7 @@ async function delay(ms) {
     try {
         return await new Promise(resolve => setTimeout(resolve, ms));
     } catch (error) {
-       alert("There is some error, please try again after some time");
+       customAlert("There is some error, please try again after some time");
         //we can send exceptions object information to server for logging and error monitoring
     }
 }
@@ -170,7 +170,7 @@ async function handleCreateRace() {
 
         await runRace(store['raceId']);
     } catch(ex) {
-        alert("There occured some error while creating and starting the race, please try after some time");
+        customAlert("There occured some error while creating and starting the race, please try after some time");
         //we can send exceptions object information to server for logging and error monitoring
     }
 }
@@ -196,18 +196,18 @@ function runRace(raceId) {
                 case "finished":
                     clearInterval(intervalTracker);
                     renderAt("#display_panel", resultsView(statusReponse['positions']));
-                    alert("Race is finished");
+                    customAlert("Race is finished");
                     resolve(statusReponse['status']);
                     break;
                 default:
-                    alert("No response from the server, please try after some time");
+                    customAlert("No response from the server, please try after some time");
                     clearInterval(intervalTracker);
                     reject(statusReponse);
             }
         }, 500);
 
     }).catch((ex) => {
-        alert("Some Error occured after race has started, please try after some time");
+        customAlert("Some Error occured after race has started, please try after some time");
         //we can send exceptions object information to server for logging and error monitoring
     })
 }
@@ -237,7 +237,7 @@ async function runCountdown() {
 
         });
     } catch (ex) {
-       alert("Some Error occured while countdown was in progress, please try after some time");
+       customAlert("Some Error occured while countdown was in progress, please try after some time");
         //we can send exceptions object information to server for logging and error monitoring
     }
 }
@@ -272,7 +272,7 @@ function handleSelection(target, type) {
         const updateProperty = `${type.toLowerCase()}Id`;
         store[updateProperty] = parseInt(target['id']);
     } catch(ex) {
-        alert("Some error occured while selecting the choice, please try after some time");
+        customAlert("Some error occured while selecting the choice, please try after some time");
         //we can send exceptions object information to server for logging and error monitoring
     }
 
@@ -301,11 +301,11 @@ function handleAccelerate() {
             .then((statusResponse) => {
 
                 if(statusResponse['status'] === "unstarted") {
-                    alert("Race has not started yet, please wait for timer countdown");
+                    customAlert("Race has not started yet, please wait for timer countdown");
                     return;
                 }
                 if(store['racerCompletionProgress'] === 100) {
-                    alert("You have already completed the Race");
+                    customAlert("You have already completed the Race");
                     return;
                 }
 
@@ -318,7 +318,7 @@ function handleAccelerate() {
             });
         return;
     }
-    alert("Race has not started yet, please wait for timer countdown");
+    customAlert("Race has not started yet, please wait for timer countdown");
 }
 
 
@@ -713,7 +713,7 @@ function getTracks() {
             return body;
         })
         .catch((ex) => {
-            alert("some error occured while fetching tracks, please try after some time");
+            customAlert("some error occured while fetching tracks, please try after some time");
             //we can send exceptions object information to server for logging and error monitoring
         });
 
@@ -732,7 +732,7 @@ function getRacers() {
             return body;
         })
         .catch(((ex) => {
-            alert("some error occured while fetching cars, please try after some time");
+            customAlert("some error occured while fetching cars, please try after some time");
             //we can send exceptions object information to server for logging and error monitoring
         }));
 }
@@ -757,7 +757,7 @@ function createRace(playerId, trackId) {
             return res.json();
         })
         .catch(err => {
-            alert("some error occured while creating the reace, please try after some time");
+            customAlert("some error occured while creating the reace, please try after some time");
             //we can send exceptions object information to server for logging and error monitoring
         })
 }
@@ -772,7 +772,7 @@ function getRace(id) {
     return fetch(`${SERVER}/api/races/${id}`)
         .then(res => res.json())
         .catch((ex) => {
-            alert("some error occured while getting race status, please try after some time");
+            customAlert("some error occured while getting race status, please try after some time");
             //we can send exceptions object information to server for logging and error monitoring
         });
 }
@@ -788,7 +788,7 @@ function startRace(id) {
         method: 'POST',
         ...defaultFetchOpts()
     }).catch(err => {
-        alert("some error occured while initialising the race, please try after some time");
+        customAlert("some error occured while initialising the race, please try after some time");
         //we can send exceptions object information to server for logging and error monitoring
     });
 }
@@ -804,7 +804,7 @@ function accelerate(id) {
         method: "POST",
         ...defaultFetchOpts()
     }).catch((ex) => {
-        alert("some error occured while accelerating the car, please try after some time");
+        customAlert("some error occured while accelerating the car, please try after some time");
        //we can send exceptions object information to server for logging and error monitoring
     })
 }
