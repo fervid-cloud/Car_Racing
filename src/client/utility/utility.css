@@ -5,9 +5,7 @@
     word-wrap: break-word;
 }
 
-body {
 
-}
 div::selection { background:transparent; }
 
 #button_for_test {
