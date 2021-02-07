@@ -6,15 +6,15 @@ const customAlert = (function () {
     currentFileName = currentFileName.split(".")[0]; // in case I put utility.js in hurry
     const requestQueue = new Queue();
 
+
     let primaryElement = null, popupTracker = null, closeTextTracker = null;
 
     onHTMLLoad()
 
     function onHTMLLoad() {
         document.addEventListener("DOMContentLoaded", () => {
-            intializationAfterDomIsLoaded()();
-            // setTimeout(intializationAfterDomIsLoaded());
-        });
+        intializationAfterDomIsLoaded()();
+        // setTimeout(intializationAfterDomIsLoaded());
     }
 
 
@@ -26,6 +26,7 @@ const customAlert = (function () {
             primaryElement = document.querySelector(".textContent");
 
             popupTracker = document.querySelector(".popup");
+
 
             closeTextTracker = document.querySelector(".contentManager .close");
 
@@ -47,12 +48,16 @@ const customAlert = (function () {
                 }
 
                 /*  if (target.customMatches("#button")) {
+
                       console.debug("target matched button");
+
                       togglePop(popupTracker);
                   }*/
 
                 if (target.customMatches(".contentManager .close")) {
+
                     console.debug("close button clicked");
+
                     togglePop(popupTracker);
                     updateRequest();
                     return;
