@@ -1,7 +1,9 @@
 
 const customAlert = (function () {
 
+    let currentFileName = "utility"
 
+    currentFileName = currentFileName.split(".")[0]; // in case I put utility.js in hurry
     const requestQueue = new Queue();
 
     let primaryElement = null, popupTracker = null;
@@ -51,7 +53,7 @@ const customAlert = (function () {
     }
 
 
-    function updateExtension(filename, expectedExtension) {
+    /* function updateExtension(filename, expectedExtension) {
 
         if(!filename) {
             throw new Error("filename is undefined passed to updateExtension");
@@ -71,10 +73,52 @@ const customAlert = (function () {
         }
 
         return `${filename}.${expectedExtension}`;
+    } */
+
+    function initializeCSSFile() {
+        const htmlHeadElement = document.querySelector("head");
+        const documentFragmentElement = document.createDocumentFragment();
+        const linkElement = document.createElement("link");
+        linkElement.setAttribute("rel", "stylesheet");
+        linkElement.setAttribute("type", "text/css");
+        const cssFile = `${getcurrentFilePathWithNameWithoutExtension()}.css`;
+        linkElement.setAttribute("href", cssFile);
+        console.log("-----------------------------------------appending file", cssFile);
+        // linkElement.setAttribute("href", `./utility/${cssFile}`);
+        documentFragmentElement.appendChild(linkElement);
+
+        htmlHeadElement.insertBefore(documentFragmentElement, null);
+        cssElement = htmlHeadElement.children[0];
+        console.log("appended css element is: ", cssElement);
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!after appending");
+        console.log(htmlHeadElement);
     }
 
 
-    function initializeCSSFile (filenames) {
+    function getcurrentFilePathWithNameWithoutExtension() {
+        // since it is loaded into the dom, it should be present, not that we are not taking last
+        //element because it is observed that both dom parsing and this javascritp running happens parallely
+        // so maybe when this function runs, a new dom element in the script has already been added
+        // so if we try to get the last element, we may get wrong script elements, so for surity, we are doing this
+        // beside Scripts can be deferred, async, modules, workers so taking just last element will be wrong in many scenario
+        const scripts = document.getElementsByTagName("script");
+        const n = scripts.length;
+        for (let i = 0; i < n; ++i) {
+            const path = scripts[i].src;
+            const names = path.split("/");
+            const nameOfFile = names[names.length - 1].split(".");
+            if (nameOfFile[0] === currentFileName) {
+                const extensionLength = nameOfFile[1].length;
+                const nn = path.length;
+                // substring(starting index inclusive, ending index exlusive)
+                currentScriptElement = scripts[i];
+                return path.substring(0, nn - (extensionLength + 1));
+            }
+        }
+        throw new Error("current filename not found");
+    }
+
+/*     function initializeCSSFile (filenames) {
         const htmlHeadElement = document.querySelector("head");
 
         // const templateElement = document.createElement("template");
@@ -94,23 +138,23 @@ const customAlert = (function () {
         });
 
         // templateElement.appendChild(documentFragmentElement);
-       /* console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!template element");
-        console.log(templateElement);
+    //    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!template element");
+    //     console.log(templateElement);
 
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!content of template element");
-        console.log(templateElement.content);
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!last element of head");
-        console.log(htmlHeadElement.lastElementChild);
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!before appending");
-        console.log(htmlHeadElement);*/
-        /**
-         * TODO check why template.content is not working here as it also returns documentFragment =
-         */
+    //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!content of template element");
+    //     console.log(templateElement.content);
+    //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!last element of head");
+    //     console.log(htmlHeadElement.lastElementChild);
+    //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!before appending");
+    //     console.log(htmlHeadElement);
+
+        //   TODO check why template.content is not working here as it also returns documentFragment =
+
         htmlHeadElement.insertBefore(documentFragmentElement, null);
         console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!after appending");
         console.log(htmlHeadElement);
     }
-
+ */
 
 
     /**
@@ -134,8 +178,8 @@ const customAlert = (function () {
         const tempElement = document.createElement("template");
         tempElement.innerHTML = requiredElement;
 
-        const cssFileNames = ["utility"];
-        initializeCSSFile(cssFileNames);
+        // const cssFileNames = ["utility"];
+        initializeCSSFile();// css file of same name is inserted in the head tag
         htmlBodyElement.insertBefore(tempElement.content, htmlBodyElement.firstElementChild);
     }
 
