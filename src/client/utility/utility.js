@@ -7,7 +7,55 @@ const customAlert = (function () {
     const requestQueue = new Queue();
 
     let primaryElement = null, popupTracker = null;
+
     onHTMLLoad()
+
+    function onHTMLLoad() {
+        document.addEventListener("DOMContentLoaded", () => {
+            // intializationAfterDomIsLoaded()();
+            setTimeout(intializationAfterDomIsLoaded(), 2000);
+        });
+    }
+
+
+    function intializationAfterDomIsLoaded() {
+        return () => {
+
+            initialization();
+
+            primaryElement = document.querySelector(".textContent");
+
+            popupTracker = document.querySelector(".popup");
+
+            document.addEventListener("click", (event) => {
+                console.log("------------utility detected the click");
+                const { target } = event;
+                console.log(target);
+                console.log("----------------------running in utility");
+                if (!target.customMatches(".box")) {
+                    console.log("target matched other than content class");
+                    if (popupTracker.classList.contains("active")) {
+                        console.log("toggling");
+                        togglePop(popupTracker);
+                        updateRequest();
+                        return;
+                    }
+                }
+
+                /*  if (target.customMatches("#button")) {
+                      console.log("target matched button");
+                      togglePop(popupTracker);
+                  }*/
+
+                if (target.customMatches(".contentManager .close")) {
+                    console.log("close button clicked");
+                    togglePop(popupTracker);
+                    updateRequest();
+                    return;
+                }
+            });
+        }
+    }
 
     function togglePop(popupTracker) {
 
@@ -184,44 +232,7 @@ const customAlert = (function () {
     }
 
 
-    function onHTMLLoad() {
-        document.addEventListener("DOMContentLoaded", () => {
 
-            initialization();
-
-            primaryElement = document.querySelector(".textContent");
-
-            popupTracker = document.querySelector(".popup");
-
-            document.addEventListener("click", (event) => {
-                console.log("------------utility detected the click");
-                const {target} = event;
-                console.log(target);
-                console.log("----------------------running in utility");
-                if (!target.customMatches(".box")) {
-                    console.log("target matched other than content class");
-                    if (popupTracker.classList.contains("active")) {
-                        console.log("toggling");
-                        togglePop(popupTracker);
-                        updateRequest();
-                        return;
-                    }
-                }
-
-                /*  if (target.customMatches("#button")) {
-                      console.log("target matched button");
-                      togglePop(popupTracker);
-                  }*/
-
-                if (target.customMatches(".contentManager .close")) {
-                    console.log("close button clicked");
-                    togglePop(popupTracker);
-                    updateRequest();
-                    return;
-                }
-            });
-        });
-    }
 
 
     function render(element, htmlView) {

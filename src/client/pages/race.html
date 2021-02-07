@@ -2,48 +2,54 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="./../loader/loader.css">
-    <script src="./../loader/loader.js"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Click Racing</title>
+    <script src="./../loader/loader.js"></script>
+    <link rel="stylesheet" href="./../loader/loader.css">
     <link rel="stylesheet" href="assets/stylesheets/race1.css">
     <link rel="stylesheet" href="assets/stylesheets/race2.css">
     <link rel="stylesheet" href="assets/stylesheets/racetrack.css">
     <link rel="stylesheet" href="assets/stylesheets/layout.css">
     <link rel="stylesheet" href="assets/stylesheets/graphicalview.css">
-    <script src= "./../utility/utility.js"></script>
+    <script src="./../utility/utility.js"></script>
     <script defer src="assets/javascript/index.js"></script>
+
 
 </head>
 
 <body id="race">
+    <section class="screenLoader">
+        <section class="loaderWrapper">
+            <img src="./../loader/loader.svg" alt="loading...">
+        </section>
+    </section>
+    <div id="header">
+        <div id="headerInside">
+            <div id="header_logo">
+                <a href="/"><img style="margin-top: 5px" src="assets/images/logo.png"></a>
+            </div>
 
-<div id="header">
-    <div id="headerInside" >
-        <div id="header_logo">
-            <a href="/"><img style="margin-top: 5px" src="assets/images/logo.png"></a>
+            <div id="sections">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a> </li>
+                </ul>
+            </div>
+
+
         </div>
-
-        <div id="sections">
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">About</a> </li>
-            </ul>
-        </div>
-
-
     </div>
-</div>
 
-<div id="bottom">
-    <section id="create-race">
-        <h3 id="createHeading">Create Your Race</h3>
-        <form id="race-form">
-            <p class="choicePrompt">Choose your track</p>
-            <ul class="cards-list" id="tracks">
+    <div id="bottom">
+        <section id="create-race">
+            <h3 id="createHeading">Create Your Race</h3>
+            <form id="race-form">
+                <p class="choicePrompt">Choose your track</p>
+                <ul class="cards-list" id="tracks">
 
-                <!-- <li id="1" class="card track">
+                    <!-- <li id="1" class="card track">
                     <h3>Track 1</h3>
                     <h3>Click To Know More</h3>
                 </li>
@@ -158,13 +164,13 @@
                     <h3>Track 12</h3>
                 </li>
  -->
-            </ul>
+                </ul>
 
 
-            <hr>
-            <p class="choicePrompt" >Choose your racer</p>
-            <ul class="cards-list" id="racers">
-<!--
+                <hr>
+                <p class="choicePrompt">Choose your racer</p>
+                <ul class="cards-list" id="racers">
+                    <!--
                 <li class="card racer" id="1">
                     <h3>Racer 1</h3>
                     <p>650</p>
@@ -199,20 +205,22 @@
                     <p>5</p>
                     <p>4</p>
                 </li> -->
-            </ul>
+                </ul>
 
-        </form>
-    </section>
+            </form>
+        </section>
 
 
-    <button class="button" type="submit" id="submit-create-race">Start Race</button>
+        <button class="button" type="submit" id="submit-create-race">Start Race</button>
 
-    <div id="footer">
-        <div id="footer_logo">
-            <!--            <img src="footer_logo.png">-->
-            <p id="footerText">RACING GAME</p>
+        <div id="footer">
+            <div id="footer_logo">
+                <!--            <img src="footer_logo.png">-->
+                <p id="footerText">RACING GAME</p>
+            </div>
         </div>
-    </div>
 
-</div>
-</body></html>
+    </div>
+</body>
+
+</html>
