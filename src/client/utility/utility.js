@@ -6,13 +6,65 @@ const customAlert = (function () {
     currentFileName = currentFileName.split(".")[0]; // in case I put utility.js in hurry
     const requestQueue = new Queue();
 
-    let primaryElement = null, popupTracker = null;
+    let primaryElement = null, popupTracker = null, closeTextTracker = null;
+
     onHTMLLoad()
+
+    function onHTMLLoad() {
+        document.addEventListener("DOMContentLoaded", () => {
+            intializationAfterDomIsLoaded()();
+            // setTimeout(intializationAfterDomIsLoaded());
+        });
+    }
+
+
+    function intializationAfterDomIsLoaded() {
+        return () => {
+
+            initialization();
+
+            primaryElement = document.querySelector(".textContent");
+
+            popupTracker = document.querySelector(".popup");
+
+            closeTextTracker = document.querySelector(".contentManager .close");
+
+            console.debug("------------------closeTextTracer is : ", closeTextTracker)
+
+            document.addEventListener("click", (event) => {
+                console.debug("------------utility detected the click");
+                const { target } = event;
+                console.debug(target);
+                console.debug("----------------------running in utility");
+                if (!target.customMatches(".box")) {
+                    console.debug("target matched other than content class");
+                    if (popupTracker.classList.contains("active")) {
+                        console.debug("toggling");
+                        togglePop(popupTracker);
+                        updateRequest();
+                        return;
+                    }
+                }
+
+                /*  if (target.customMatches("#button")) {
+                      console.debug("target matched button");
+                      togglePop(popupTracker);
+                  }*/
+
+                if (target.customMatches(".contentManager .close")) {
+                    console.debug("close button clicked");
+                    togglePop(popupTracker);
+                    updateRequest();
+                    return;
+                }
+            });
+        }
+    }
 
     function togglePop(popupTracker) {
 
         popupTracker.classList.toggle("active");
-        console.log(popupTracker.classList.toString());
+        console.debug(popupTracker.classList.toString());
     }
 
 
@@ -83,15 +135,15 @@ const customAlert = (function () {
         linkElement.setAttribute("type", "text/css");
         const cssFile = `${getcurrentFilePathWithNameWithoutExtension()}.css`;
         linkElement.setAttribute("href", cssFile);
-        console.log("-----------------------------------------appending file", cssFile);
+        console.debug("-----------------------------------------appending file", cssFile);
         // linkElement.setAttribute("href", `./utility/${cssFile}`);
         documentFragmentElement.appendChild(linkElement);
 
         htmlHeadElement.insertBefore(documentFragmentElement, null);
         cssElement = htmlHeadElement.children[0];
-        console.log("appended css element is: ", cssElement);
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!after appending");
-        console.log(htmlHeadElement);
+        console.debug("appended css element is: ", cssElement);
+        console.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!after appending");
+        console.debug(htmlHeadElement);
     }
 
 
@@ -127,7 +179,7 @@ const customAlert = (function () {
             let cssFile = cssFilename;
 
             cssFile = updateExtension(cssFile, "css");
-            console.log("-----------------------------------------appending file", cssFile);
+            console.debug("-----------------------------------------appending file", cssFile);
 
             const linkElement = document.createElement("link");
             linkElement.setAttribute("rel", "stylesheet");
@@ -138,21 +190,21 @@ const customAlert = (function () {
         });
 
         // templateElement.appendChild(documentFragmentElement);
-    //    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!template element");
-    //     console.log(templateElement);
+    //    console.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!template element");
+    //     console.debug(templateElement);
 
-    //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!content of template element");
-    //     console.log(templateElement.content);
-    //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!last element of head");
-    //     console.log(htmlHeadElement.lastElementChild);
-    //     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!before appending");
-    //     console.log(htmlHeadElement);
+    //     console.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!content of template element");
+    //     console.debug(templateElement.content);
+    //     console.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!last element of head");
+    //     console.debug(htmlHeadElement.lastElementChild);
+    //     console.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!before appending");
+    //     console.debug(htmlHeadElement);
 
         //   TODO check why template.content is not working here as it also returns documentFragment =
 
         htmlHeadElement.insertBefore(documentFragmentElement, null);
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!after appending");
-        console.log(htmlHeadElement);
+        console.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!after appending");
+        console.debug(htmlHeadElement);
     }
  */
 
@@ -171,57 +223,18 @@ const customAlert = (function () {
      * @type {HTMLTemplateElement}
      */
     function initialization() {
+
+        initializeCSSFile();// css file of same name is inserted in the head tag
+
         const htmlBodyElement = document.querySelector('body');
         const requiredElement = createRequiredElement();
-
-
         const tempElement = document.createElement("template");
         tempElement.innerHTML = requiredElement;
-
-        // const cssFileNames = ["utility"];
-        initializeCSSFile();// css file of same name is inserted in the head tag
         htmlBodyElement.insertBefore(tempElement.content, htmlBodyElement.firstElementChild);
     }
 
 
-    function onHTMLLoad() {
-        document.addEventListener("DOMContentLoaded", () => {
 
-            initialization();
-
-            primaryElement = document.querySelector(".textContent");
-
-            popupTracker = document.querySelector(".popup");
-
-            document.addEventListener("click", (event) => {
-                console.log("------------utility detected the click");
-                const {target} = event;
-                console.log(target);
-                console.log("----------------------running in utility");
-                if (!target.customMatches(".box")) {
-                    console.log("target matched other than content class");
-                    if (popupTracker.classList.contains("active")) {
-                        console.log("toggling");
-                        togglePop(popupTracker);
-                        updateRequest();
-                        return;
-                    }
-                }
-
-                /*  if (target.customMatches("#button")) {
-                      console.log("target matched button");
-                      togglePop(popupTracker);
-                  }*/
-
-                if (target.customMatches(".contentManager .close")) {
-                    console.log("close button clicked");
-                    togglePop(popupTracker);
-                    updateRequest();
-                    return;
-                }
-            });
-        });
-    }
 
 
     function render(element, htmlView) {
@@ -234,14 +247,14 @@ const customAlert = (function () {
 
     function updateRequest() {
         requestQueue.remove();
-        console.log("updating queue");
+        console.debug("updating queue");
         if (requestQueue.isEmpty()) {
-            console.log("no further request is there");
+            console.debug("no further request is there");
             return;
         }
-        console.log("serving further request");
+        console.debug("serving further request");
         setTimeout(() => {
-            console.log("set timeout is called");
+            console.debug("set timeout is called");
             displayPopUp(requestQueue.peek());
         }, 300);
 
@@ -249,10 +262,10 @@ const customAlert = (function () {
 
 
     function requestEntryManager (textContent) {
-        console.log("adding to the queue");
+        console.debug("adding to the queue");
         requestQueue.add(textContent);
         if(requestQueue.size() === 1) {
-            console.log("queue is empty, so executing");
+            console.debug("queue is empty, so executing");
             displayPopUp(requestQueue.peek());
         }
     }
@@ -260,15 +273,15 @@ const customAlert = (function () {
 
 
     function displayPopUp(textContent) {
-        console.log("------- this time text content is: ", textContent);
+        console.debug("------- this time text content is: ", textContent);
 
         if (primaryElement === null) {
             alert("please wait for the page to be completely loaded")
         } else {
-            console.log("rendering in text Content");
+            console.debug("rendering in text Content");
             render(primaryElement, textContent);
             togglePop(popupTracker);
-            console.log("popped");
+            console.debug("popped");
         }
     }
 

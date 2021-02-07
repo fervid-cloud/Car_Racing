@@ -529,17 +529,17 @@ function getCarInfo(objectInfo) {
 
 
 function getFormattedName(driverName) {
-    console.log("driver name is : ", driverName);
+    console.debug("driver name is : ", driverName);
     const nameLength = driverName.length;
     let updatedName = driverName;
     if (nameLength > 15) {
         const firstPart = driverName.substring(0, 5);
         const secondPart = driverName.substring(nameLength - 7, nameLength);
-        console.log("first part ", firstPart);
-        console.log("second part: ", secondPart);
+        console.debug("first part ", firstPart);
+        console.debug("second part: ", secondPart);
         updatedName =  firstPart+ "..." + secondPart;
     }
-    console.log("updated name is : ", updatedName);
+    console.debug("updated name is : ", updatedName);
     return updatedName;
 }
 
