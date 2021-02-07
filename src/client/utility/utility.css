@@ -1,0 +1,145 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    word-wrap: break-word;
+}
+
+body {
+
+}
+div::selection { background:transparent; }
+
+#button_for_test {
+    height: 60px;
+    width: 80px;
+    background-color: green;
+    cursor: pointer;
+    margin: 20px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+#button_for_test:hover {
+    background-color: forestgreen;
+}
+
+#button_for_test:active {
+    background-color: darkgreen;
+}
+
+
+.overlay {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 1;
+    display: none;
+    /*padding: 25px; */ /* will not work because it is according to viewport not inside elements*/
+    overflow: auto;
+}
+
+/**
+Just made it for more control of .box selector position so that our box is relative to something inside the .overlay
+rather than soemthing outside the overlay other than this it doesn't make a difference for overflowing
+our content of the box as .box has gone out of the normal flow and it's like it doesn't take a space in
+.boxWrapper so when the height of the .box increases, due to overflow property of .overlay we are able to scroll
+to see the full view content of the box(why this happened, because .overlay is set to overflow, so if any child
+inside goes beyond it's max height, it will make a scroller to view the content in the same height
+(fact: body and html has overflow attribute set by default, and other elements have overflow
+hidden by default))
+ */
+.boxWrapper {
+    /*position: relative;*/
+    /*z-order: -10; !* it will not work now as no position except static(which is by default) is specified here *!*/
+    width: 100%;
+    /* padding: 40px; */
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    /*height: inherit;*/ /* got the height of parent element that is .overlay */
+}
+
+
+/**
+we can make only box as overflow by setting it overflow as auto but it needs fix height and width has to be set
+doesn't matter how you set
+ */
+.box {
+    /*position: absolute;*/
+    /*top: 30%;*/
+    margin: auto;
+    /*left:0;*/
+    /*right:0;*/
+    background: #fff;
+    /* width: 450px; */
+    /*height: 250px;*/ /*will work with internal scrolling for only i.e for scrolling of .box only */
+    /*min-height: 220px; */ /*will not work for scrolling i.ei.e for scrolling of .box only*/
+    /* min-height: 220px; /*setting up a standard height even if content is not much */
+    z-index: 2;
+    text-align: center;
+    padding: 3.5vmin;
+    /*transition: all 300ms ease-out;*/
+    border-radius: 0.5vmin;
+    /*overflow: auto;*/
+}
+
+.contentManager {
+    display: flex;
+    flex-direction: column;
+    min-height: inherit;
+    /*height: 100%;*/
+}
+
+.contentManager .close {
+    font-size: 3vmin;
+    background-color: forestgreen;
+    margin: auto 0;
+    cursor: pointer;
+    box-shadow: 0.5vmin 1vmin 1.1vmin #444;
+    font-family: "Droid Sans Mono";
+    color: wheat;
+    padding: 1.5vmin;
+}
+
+.contentManager .close:hover {
+    background-color: green;
+}
+
+.contentManager .close:active {
+    background-color: darkgreen;
+}
+
+.popup.active .overlay {
+    display: block;
+}
+
+.popup.active .box {
+
+    /*transition: all 300ms ease-in-out;*/
+    /*transform: translate(-50%, -50%) scale(1);*/
+}
+
+.contentManager .textContainer {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    /* margin-bottom: 20px; */
+
+}
+
+.contentManager .textContent {
+    font-size: 3vmin;
+    margin: auto;
+    text-align: center;
+    padding: 5vmin 0;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    /*flex-grow: 1;*/
+}

@@ -1,14 +1,11 @@
 import * as express from 'express';
 import RaceService from './RaceService';
-import { Request, Response, NextFunction} from 'express';
+import { Request, Response } from 'express';
 import Container from 'typedi';
 
 const raceController = express.Router();
 
 const raceService: RaceService = Container.get(RaceService);
-
-
-
 
 /**
 [GET] `api/tracks`
@@ -139,16 +136,9 @@ raceController.post("/races/:id/accelerate", (req, res) => {
     });
 });
 
-
 /* function isArrayOfStrings(value: any): boolean {
     return Array.isArray(value) && value.every(item => typeof item === "string");
 }
  */
-
-
-
-raceController.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    res.send({ error: err.message });
-})
 
 module.exports = raceController;
