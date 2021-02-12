@@ -127,7 +127,7 @@ form li h3 {
 
 
 .button:active {
-    font-size: 21px;
+    font-size: 3.5vmin;
     background-color: yellow;
 }
 

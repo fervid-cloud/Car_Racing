@@ -3,6 +3,7 @@
     background-image: url("../images/race.jpg");
     background-size: cover;
     background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
 
@@ -10,31 +11,39 @@
 
 
 header {
-    margin-bottom: 15px;
-    padding: 5px 30px;
+    margin: 1vmin 2vmin;
+    padding: 1vmin 3vmin;
     font-family: fantasy;
     background-color: darkolivegreen;
     color: wheat;
-    border-radius: 20px;
+    border-radius: 2vmin;
     display: flex;
     justify-content: center;
 /*    display: inline-block;*/
-    box-shadow: 4px -4px 15px 0px #FF1F1F, 12px -11px 7px 0px #FF9376, 20px -5px 7px 0px #FFE264, 20px 6px 7px 0px #F6FF33, 13px 12px 17px 0px #FF9527, 2px 17px 17px 0px #FF0000, -9px 21px 18px 0px #FFF212, -9px 6px 11px 0px #FF0808, -11px -9px 11px 0px #FFFA17, -11px -9px 11px 0px #FFFA17, 11px 5px 15px 5px rgba(0, 0, 0, 0);
-    box-shadow: 4px -4px 15px 0px #FF1F1F, 12px -11px 7px 0px #FF9376, 20px -5px 7px 0px #FFE264, 20px 6px 7px 0px #F6FF33, 13px 12px 17px 0px #FF9527, 2px 17px 17px 0px #FF0000, -9px 21px 18px 0px #FFF212, -9px 6px 11px 0px #FF0808, -11px -9px 11px 0px #FFFA17, -11px -9px 11px 0px #FFFA17, 11px 5px 15px 5px rgba(0, 0, 0, 0);
+    /* box-shadow: 1.5vmin -1.5vmin 4vmin 0px #FF1F1F, 3vmin -2.5vmin 7px 0px #FF9376, 5vmin -2vmin 2vmin 0px #FFE264, 20px 6px 7px 0px #F6FF33, 13px 12px 17px 0px #FF9527, 2px 17px 17px 0px #FF0000, -9px 21px 18px 0px #FFF212, -9px 6px 11px 0px #FF0808, -11px -9px 11px 0px #FFFA17, -11px -9px 11px 0px #FFFA17, 11px 5px 15px 5px rgba(0, 0, 0, 0);
+    box-shadow: 1.5vmin -1.5vmin 4vmin 0px #FF1F1F, 12px -11px 7px 0px #FF9376, 20px -5px 7px 0px #FFE264, 20px 6px 7px 0px #F6FF33, 13px 12px 17px 0px #FF9527, 2px 17px 17px 0px #FF0000, -9px 21px 18px 0px #FFF212, -9px 6px 11px 0px #FF0808, -11px -9px 11px 0px #FFFA17, -11px -9px 11px 0px #FFFA17, 11px 5px 15px 5px rgba(0, 0, 0, 0); */
     align-self: center;
+}
+
+header h1 {
+    font-size: 2vmin;
 }
 
 
 
 #display_panel {
-    border: 2px solid blue;
+    height: 100%;
+    width: 100vw;
+    /* border: 2px solid blue; */
     background-color: rgba(0, 4, 255, 0.27);
     display: flex;
     /*justify-content: space-around;*/
-    min-height: min-content;
-    border-radius: 15px;
-    padding: 10px 10px;
-    margin: 20px;
+    /* min-height: min-content; */
+    border-radius: 0.7vmin;
+    /* padding: 2vmin 2vminpx; */
+    /* margin: 0px 2vmin; */
+    position: relative;
+    /* flex-wrap: wrap; */
     /* since here we have not specfied the width, it is by default set to auto */
     /* so when I did margin: 20px, I see that my width got reduced from both the left and right side why
     It is not caused by the fact that the div is a child of another div, but by the fact that I was not
@@ -49,9 +58,25 @@ header {
      */
 }
 
+#display_panel > section {
+    position: absolute;
+    transition: all .2s linear;
+}
+
+
+.centeringDiv {
+    margin: auto;
+}
+
+/* .centeringDiv > * {
+    margin: auto;
+} */
+
+
 #big-numbers {
     font-weight: bolder;
-    font-size: 70px;
+    font-size: 7vmin;
+    padding: 4vmin;
 }
 
 
@@ -59,13 +84,13 @@ li {
     list-style-type: none;
     font-family:fantasy;
     font-size: 22px;
-    
+
 }
 
 li:hover {
     cursor: pointer;
     color: burlywood;
-    
+
 }
 
 a, a:hover, a:focus, a:active {

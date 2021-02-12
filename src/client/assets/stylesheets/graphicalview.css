@@ -2,44 +2,66 @@
 /* for race UI  */
 
 
+
+
 :root {
-    --carHeight:  40px;
-    --carWidth: 20px;
-    --commonRadius: 6px;
+
+    --carHeight: 7vmin;
+    --carWidth: 3vmin;;
+    --commonRadius: .7vmin;
 }
 #leaderBoard {
-    flex-grow: 1;
+    /* flex-grow: 1; */
     display: flex;
     flex-direction: column;
-    font-size: 1.5vh;
+    /* font-size: min(2vmin, 1.5vh);; */
+    overflow-x: auto;
+    position: absolute;
+}
+
+#accelerate {
+    position: absolute;
 }
 
 
 #leaderBoard li {
-    font-size: 1.5vh;
+    /* font-size:min(2vmin, 1.5vh);; */
+    font-size: 100%;
 }
 
 
 #raceArea {
     display: flex;
     background-color: darkcyan;
-    margin-top: 10px;
-    justify-content: space-around;
-    padding: 15px 0px;
-    border-radius: 15px;
-    font-size: 1.5vh;
+    margin-top: 1vmin;
+    /* justify-content: space-around; */
+    padding: 2vmin 0px;
+    border-radius: 0.5vmin;
+    font-size: min(1.8vmin, 1.7vh);
+    overflow-x: auto;
+    height: 90%;
+    /* margin: auto; */
     /*padding: 20px 0px;*/
     /*height: 100%;*/
+    align-items: center;
+}
+
+#raceArea > .trackView {
+    margin: auto;
 }
 
 .carInfoView li, progressView p{
     font-family: 'Anton', sans-serif;
+    font-size: 100%;
 }
 
 .trackView {
     background-color: #FF9376;
     border-radius: var(--commonRadius);
-    /*height: 100%;*/
+    margin: 0px 2vmin;
+    height: 95%;
+    display: flex;
+   flex-direction: column;
 }
 
 .mainTrack {
@@ -48,8 +70,9 @@
     /*                taking elements, since it's parent has*/
     /*                *!*/
 
-    height: 300px;
-    min-width: 80px;
+   /* height: 71%; */
+   flex-grow: 1;
+   width: 14vmin;
     border-top: 0.5px solid brown;
     border-bottom: 0.5px solid brown;
     /*width: 100%; because div increase according to the size of it's max width or height or both child size and stretches
@@ -63,18 +86,22 @@
     background-color: bisque;
     border-top-left-radius: var(--commonRadius);
     border-top-right-radius: var(--commonRadius);
+    height: 4%;
+    display: flex;
 
     /*background-color: cadetblue;*/
 }
 
 .progressView p {
     text-align: center;
+    margin: auto;
 }
 
 
 .carView {
     background-image: url("../images/race_car.png");
     background-size: contain;
+    background-repeat: no-repeat;
     position: absolute;
     width: var(--carWidth);
     height: var(--carHeight);
@@ -89,14 +116,17 @@
 
 
 .carStart {
-    height: calc(var(--carHeight) + 5px);
+    height: calc(var(--carHeight) + 1vmin);
     background-color: darkkhaki;
+    /* height: cal(var(--carHeight)) */
 }
 
 .carInfoView {
     background-color: bisque;
     border-bottom-left-radius: var(--commonRadius);
     border-bottom-right-radius: var(--commonRadius);
+    height: 8%;
+    margin-bottom: 0px;
 }
 
 .carInfoView ul {
@@ -104,6 +134,10 @@
     flex-direction: column;
     align-items: center;
 
+}
+
+.carInfoView ul li {
+    border-radius: 1vmin;
 }
 
 .myCar {

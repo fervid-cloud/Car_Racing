@@ -15,13 +15,7 @@ const app = express();
 const raceTrackerController = require("./race_handler/RaceController");
 
 //redirecting to https
-app.use((req: Request, res: Response, next: NextFunction) => {
-    if (req.header('x-forwarded-proto') !== 'https') {
-        res.redirect(`https://${req.header('host')}${req.url}`)
-    } else {
-        next();
-    }
-});
+app.use(httpRedirection);
 
 // setup the ability to see into response bodies
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -52,3 +46,13 @@ app.get("/about", (req: Request, res: Response) => {
 });
 
 app.listen(port, () => console.log(`Click Car Racing App is listening on port ${port}!`))
+
+
+function httpRedirection (req: Request, res: Response, next: NextFunction) {
+
+    if (req.header('x-forwarded-proto') !== 'https') {
+        res.redirect(`https://${req.header('host')}${req.url}`)
+    } else {
+        next();
+    }
+}

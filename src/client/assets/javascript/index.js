@@ -107,6 +107,7 @@ function setupClickHandlers() {
                 event.preventDefault();
 
                 if (!(store['trackId'] && store['racerId'])) {
+                    // customAlert("You must submit both track and race car");
                     customAlert("You must submit both track and race car");
                     return;
                 }
@@ -144,6 +145,15 @@ async function delay(ms) {
 }
 
 
+//resize is only valid for the window
+window.addEventListener('resize', () => {
+    // console.debug("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^resize called");
+    if (layoutManager.isReady()) {
+        layoutManager.updateLayout();
+    }
+});
+
+
 /**
  * handles the process of creating the race to starting the race and ui handling for race starting
  * @returns {Promise<void>}
@@ -152,8 +162,10 @@ async function handleCreateRace() {
 
     try {
         // render starting UI
-        renderAt('#bottom', renderRaceStartView(store["trackId"]));
 
+        renderAt('#bottom', renderRaceStartView(store["trackId"]));
+        layoutManager.initialize();
+        layoutManager.updateLayout();
         const {racerId, trackId} = store;
 
         const race = await createRace(racerId, trackId);
@@ -191,9 +203,11 @@ function runRace(raceId) {
 
             switch (statusReponse['status']) {
                 case "in-progress":
-                    renderAt("#leaderBoard",raceInProgress(statusReponse['positions']));
+                    renderAt("#leaderBoard", raceInProgress(statusReponse['positions']));
                     break;
+
                 case "finished":
+
                     clearInterval(intervalTracker);
                     renderAt("#display_panel", resultsView(statusReponse['positions']));
                     customAlert("Race is finished");
@@ -440,9 +454,9 @@ function renderRaceStartView(trackId) {
 			</section>
 
 			<section id="accelerate">
-				<h2>Instruction</h2>
-				<p>Click the button as fast as you can to make your racer go faster!</p>
-				<button id="gas-peddle">Accelerate My Car!</button>
+                    <h2 >Instruction</h2>
+                    <p>Click the button as fast as you can to make your racer go faster!</p>
+                    <button id="gas-peddle">Accelerate My Car!</button>
 			</section>
 		</div>
 		<div id="footer">
@@ -465,7 +479,7 @@ function resultsView(positions) {
 
     return `
         <div id="results">
-            <section id="leaderboard" style="align-items: center">
+            <section class="resultTable" style="align-items: center">
                 <h1>Race Results</h1>
                 <table>
                     <tr id="titles">
@@ -573,7 +587,7 @@ function getView(positions) {
                      <div class="carStart">
 
                     </div>
-                     <div class="${carInfoView}" style="font-size: 15px;">
+                     <div class="${carInfoView}">
                             ${getCarInfo(element)}
                      </div>
         </div>
@@ -596,7 +610,16 @@ function raceInProgress(positions) {
     const graphicalUI = `
                 <h1>Race Progress</h1>
                 <div id="raceArea">
-                 <div class="trackView" style="background-color: inherit;">
+
+                ${getView(positions)}
+    </div>`;
+
+    return graphicalUI;
+}
+
+
+function notInuse() {
+    const value = `<div class="trackView" style="background-color: inherit;">
 
                     <div class="progressView" style="border-radius: 3px">
                         <p> Race completion-> </p>
@@ -608,17 +631,13 @@ function raceInProgress(positions) {
                     <div class="carStart" style="background-color: inherit; border: 0px;">
 
                     </div>
-                     <div class="carInfoView" style="font-size: 15px; border-radius: 5px">
+                     <div class="carInfoView">
                            <ul>
                                  <li> Racer Name-> </li>
                                  <li> Current Speed-> </li>
                            </ul>
                      </div>
-                </div>
-                ${getView(positions)}
-    </div>`;
-
-    return graphicalUI;
+                </div>`;
 }
 
 

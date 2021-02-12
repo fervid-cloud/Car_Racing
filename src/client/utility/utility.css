@@ -91,7 +91,8 @@ doesn't matter how you set
 .contentManager {
     display: flex;
     flex-direction: column;
-    min-height: inherit;
+    min-width: 22vmax;
+    max-width: 35vmax;
     /*height: 100%;*/
 }
 
