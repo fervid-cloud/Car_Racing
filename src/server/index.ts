@@ -3,18 +3,25 @@ const expressOasGenerator = require('express-oas-generator');
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 const port = process.env.PORT || 3500;
 const app = express();
 
 
-expressOasGenerator.init(app, {});
+// expressOasGenerator.init(app, {});
 
 //rest apis routers
 const raceTrackerController = require("./race_handler/RaceController");
 
-
+//redirecting to https
+app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.header('x-forwarded-proto') !== 'https') {
+        res.redirect(`https://${req.header('host')}${req.url}`)
+    } else {
+        next();
+    }
+});
 
 // setup the ability to see into response bodies
 app.use(bodyParser.urlencoded({ extended: false }))

@@ -16,7 +16,7 @@ The game has three main views:
 
 ### Start the appilcation
 
-First, run your preference of `npm install && npm start` or `yarn && yarn start` at the root of this project. Then you should be able to access http://localhost:3000 and play the game.
+After cloning the master branch, First, run your preference of `npm install && npm start` or `yarn && yarn start` at the root of this project. Then you should be able to access http://localhost:3500 and play the game.
 
 ### play the game
-You can play the game live by going by environments section of the this repository which is at the right side.
+You can play the game live at <a href="https://clickcarrace.bnxn.live" target="_blank" rel="noopener noreferrer">ClickCarRacing</a>
