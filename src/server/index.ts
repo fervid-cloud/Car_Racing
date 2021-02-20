@@ -1,25 +1,27 @@
 import 'reflect-metadata';
-const expressOasGenerator = require('express-oas-generator');
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
+import express from 'express';
+import bodyParser from 'body-parser';
+import path from 'path';
 import { NextFunction, Request, Response } from 'express';
 
 const port = process.env.PORT || 3500;
 const app = express();
 
 
-// expressOasGenerator.init(app, {});
-
-//rest apis routers
-const raceTrackerController = require("./race_handler/RaceController");
-
 //redirecting to https
-app.use(httpRedirection);
+console.log(`This is a ${process.env.DEV ? 'Development' : 'Production'} Environment`);
+if(!process.env.DEV) {
+    app.use(httpRedirection);
+}
+
 
 // setup the ability to see into response bodies
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+
+//rest apis routers
+const raceTrackerController = require("./race_handler/RaceController");
+
 app.use("/api", raceTrackerController);
 
 // setup the express assets path
